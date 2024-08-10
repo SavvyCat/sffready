@@ -11,6 +11,11 @@ export default function Home() {
   const [searchText, setSearchText] = useState("");
   const [gpus, setGpus] = useState([]);
   const [selectedGpu, setSelectedGpu] = useState(null); // State to hold the selected GPU
+  const [visibleCount, setVisibleCount] = useState(4);
+
+  const loadMore = () => {
+    setVisibleCount((prevCount) => prevCount + 4);
+  };
 
   useEffect(() => {
     async function getData() {
@@ -73,13 +78,13 @@ export default function Home() {
               alt="Selected GPU"
               className="w-[25rem]"
             />
-          ) : (
-            <div className="mt-[-50px] mb-[-90px]">
+          ) : (<></>
+            /*<div className="mt-[-50px] mb-[-90px]">
               <video autoPlay muted loop width="600">
                 <source src="/Video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
-            </div>
+            </div>*/
           )}
         </div>
         <div className="flex justify-center items-center">
@@ -157,7 +162,7 @@ export default function Home() {
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {cases.map((caseItem, index) => {
+            {cases.slice(0, visibleCount).map((caseItem, index) => {
               const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
               return (
                 <div
@@ -178,6 +183,16 @@ export default function Home() {
               );
             })}
           </div>
+          {visibleCount < cases.length && (
+            <div className="flex justify-center mt-5">
+              <button
+                onClick={loadMore}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
+              >
+                Load More
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

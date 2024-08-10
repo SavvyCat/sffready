@@ -64,7 +64,7 @@ export default function Home() {
       </div>
       <div className="mb-[2rem]"></div>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl z-10">
-        <div className="flex justify-center mb-10 mt-16">
+        <div className="flex justify-center mb-10 mt-20">
           {" "}
           {/* Adjusted margin-top to push content down */}
           {selectedGpu ? (
@@ -75,7 +75,7 @@ export default function Home() {
             />
           ) : (
             <div className="mt-[-50px] mb-[-90px]">
-              <video autoPlay muted loop width="800">
+              <video autoPlay muted loop width="600">
                 <source src="/Video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>

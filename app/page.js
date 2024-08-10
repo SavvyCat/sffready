@@ -58,13 +58,13 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
-        <h1 className="lg:text-7xl text-4xl flex justify-center items-center mt-10">
+        <h1 className="font-bold lg:text-7xl text-4xl flex justify-center items-center mt-10">
           SFF Ready?
         </h1>
       </div>
       <div className="mb-[2rem]"></div>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl z-10">
-        <div className="flex justify-center mb-10 mt-20">
+        <div className="flex justify-center lg:mb-10 mb-20 mt-20">
           {" "}
           {/* Adjusted margin-top to push content down */}
           {selectedGpu ? (

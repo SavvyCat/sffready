@@ -58,7 +58,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
-        <h1 className="font-bold sm:text-7xl text-4xl flex justify-center items-center mt-14">
+        <h1 className="font-bold sm:text-7xl text-5xl flex justify-center items-center mt-20">
           SFF Ready?
         </h1>
       </div>

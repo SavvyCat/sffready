@@ -58,7 +58,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
-        <h1 className="font-bold lg:text-7xl text-4xl flex justify-center items-center mt-10">
+        <h1 className="font-bold lg:text-7xl text-4xl flex justify-center items-center mt-14">
           SFF Ready?
         </h1>
       </div>
@@ -111,7 +111,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col justify-center items-center">
                 <label className="block text-lg font-bold text-gray-700">
-                  Thickness
+                  Thickness(slots)
                 </label>
                 <input
                   type="number"

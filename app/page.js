@@ -56,23 +56,26 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
-        <h1 className="lg:text-7xl text-xl flex justify-center items-center mb-6">
+    <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
+      <div className="absolute top-0 w-full flex justify-center items-center z-50">
+        <h1 className="lg:text-7xl text-4xl flex justify-center items-center mt-10">
           SFF Ready?
         </h1>
-        <div className="flex justify-center mb-10">
+      </div>
+      <div className="mb-[2rem]"></div>
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl z-10">
+        <div className="flex justify-center mb-10 mt-16">
+          {" "}
+          {/* Adjusted margin-top to push content down */}
           {selectedGpu ? (
-            <>
-              <img
-                src={selectedGpu.image_url}
-                alt="Selected GPU"
-                className="w-[30rem]"
-              />
-            </>
+            <img
+              src={selectedGpu.image_url}
+              alt="Selected GPU"
+              className="w-[25rem]"
+            />
           ) : (
-            <div className="">
-              <video controls width="600">
+            <div className="mt-[-50px] mb-[-90px]">
+              <video autoPlay muted loop width="800">
                 <source src="/Video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
@@ -81,7 +84,7 @@ export default function Home() {
         </div>
         <div className="flex justify-center items-center">
           <div className="w-4/5">
-            <div className="grid grid-cols-1 sm:grid-cols-3  mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 mb-6">
               <div className="flex flex-col justify-center items-center">
                 <label className="block text-lg font-bold text-gray-700">
                   Length (mm)
@@ -121,38 +124,38 @@ export default function Home() {
             </div>
           </div>
         </div>
-          <div className="flex flex-col justify-center items-center gap-10">
+        <div className="flex flex-col justify-center items-center gap-10">
           <div className="w-8/12">
-        <div className="mb-6">
-          <input
-            type="text"
-            value={searchText}
-            onChange={handleSearchChange}
-            placeholder=" Search GPU"
-            className=" mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
-        </div>
-
-        <div className="flex flex-col gap-10">
-          <div className="bg-gray-100 p-4 rounded-lg shadow-inner max-h-64 overflow-y-auto">
-            {gpus.length && searchText.length > 0 ? (
-              <ul>
-                {gpus.map((gpuItem, index) => (
-                  <li
-                    key={index}
-                    className="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-200"
-                    onClick={() => handleGpuSelection(gpuItem)} // Select GPU on click
-                  >
-                    {gpuItem.title}{" "}
-                    {/* Adjust this to match your GPU property name */}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">No GPUs found.</p>
-            )}
-          </div></div></div>
-
+            <div className="mb-6">
+              <input
+                type="text"
+                value={searchText}
+                onChange={handleSearchChange}
+                placeholder=" Search GPU"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-10">
+              <div className="bg-gray-100 p-4 rounded-lg shadow-inner max-h-64 overflow-y-auto">
+                {gpus.length && searchText.length > 0 ? (
+                  <ul>
+                    {gpus.map((gpuItem, index) => (
+                      <li
+                        key={index}
+                        className="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-200"
+                        onClick={() => handleGpuSelection(gpuItem)} // Select GPU on click
+                      >
+                        {gpuItem.title}{" "}
+                        {/* Adjust this to match your GPU property name */}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500">No GPUs found.</p>
+                )}
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {cases.map((caseItem, index) => {
               const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
@@ -168,7 +171,9 @@ export default function Home() {
                       className="w-full h-48 object-cover bg-slate-200"
                     />
                   </a>
-                  <p className="flex justify-center items-center text-sm">{caseItem.product_name}</p>
+                  <p className="flex justify-center items-center text-sm">
+                    {caseItem.product_name}
+                  </p>
                 </div>
               );
             })}

@@ -78,13 +78,11 @@ export default function Home() {
               alt="Selected GPU"
               className="w-[25rem]"
             />
-          ) : (<></>
-            /*<div className="mt-[-50px] mb-[-90px]">
-              <video autoPlay muted loop width="600">
-                <source src="/Video.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>*/
+          ) : (
+            <div className="mt-[-50px] mb-[-90px]">
+              <img src="Video.gif" className="w-[40rem] mb-16"/>
+              
+            </div>
           )}
         </div>
         <div className="flex justify-center items-center">

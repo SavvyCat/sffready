@@ -64,7 +64,7 @@ export default function Home() {
       </div>
       <div className="mb-[2rem]"></div>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl z-10">
-        <div className="flex justify-center lg:mb-10 mb-20 mt-20">
+        <div className="flex justify-center lg:mb-10 mb-20 mt-32">
           {" "}
           {/* Adjusted margin-top to push content down */}
           {selectedGpu ? (

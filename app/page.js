@@ -168,6 +168,7 @@ export default function Home() {
                       className="w-full h-48 object-cover bg-slate-200"
                     />
                   </a>
+                  <p className="flex justify-center items-center text-sm">{caseItem.product_name}</p>
                 </div>
               );
             })}

@@ -80,8 +80,7 @@ export default function Home() {
             />
           ) : (
             <div className="mt-[-50px] mb-[-90px]">
-              <img src="Video.gif" className="w-[40rem] mb-16"/>
-              
+              <img src="Video.gif" className="w-[40rem] mb-16" />
             </div>
           )}
         </div>
@@ -161,7 +160,8 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {cases.slice(0, visibleCount).map((caseItem, index) => {
-              const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
+              //const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
+              const imagelocation1 = `https://github.com/MariooY2/Redditfreelance4/blob/main/public/images/${caseItem.image_id}/1.jpg?raw=true`;
               return (
                 <div
                   key={index}

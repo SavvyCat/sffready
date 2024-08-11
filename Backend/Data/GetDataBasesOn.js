@@ -15,3 +15,4 @@ export default async function getFilteredCases(gpuLength, gpuHeight, gpuSlots) {
 
   return CASES;
 }
+//const imagelocation1 = `https://github.com/MariooY2/Redditfreelance4/blob/main/public/images/${caseItem.image_id}/1.jpg?raw=true`;

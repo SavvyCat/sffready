@@ -59,7 +59,7 @@ export default function Home() {
     setHeight(gpuItem.height); // Assuming `height` is a property of the GPU
     setThickness(gpuItem.thickness); // Assuming `thickness` is a property of the GPU
   };
-
+  const gpuimagelocation=`/images-gpu/${selectedGpu?.image_id}.jpg`
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
@@ -74,13 +74,16 @@ export default function Home() {
           {/* Adjusted margin-top to push content down */}
           {selectedGpu ? (
             <img
-              src={selectedGpu.image_url}
+              src={gpuimagelocation}
               alt="Selected GPU"
               className="w-[25rem]"
             />
           ) : (
-            <div className="mt-[-50px] mb-[-90px]">
-              <img src="Video.gif" className="w-[40rem] mb-16" />
+            <div className="mt-[10px] mb-[20px] ">
+              <video autoPlay muted loop width="600">
+                <source src="/v2.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
           )}
         </div>

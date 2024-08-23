@@ -5,7 +5,7 @@ export default async function getFilteredGPUs(partialMatch) {
   let query = supabase
     .from("GPU")
     .select("*")
-    .ilike("GPU", `%${partialMatch}%`); // `%` is a wildcard that matches any sequence of characters after the input
+    .ilike("title", `%${partialMatch}%`); // `%` is a wildcard that matches any sequence of characters after the input
 
   const { data, error } = await query;
 

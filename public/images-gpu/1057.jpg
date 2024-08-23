@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><script src="/began-body-not-borne-looke-way-you-vnusuall-are-" async></script>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="9phH2VMHTVEXP1rzrcZ9n6XGlNKiV6NXUnV3YPyu">
+
+                    <title>Custom PC Builder | PC Build Configurator | CORSAIR</title>
+
+    <meta name="keywords" content="CUSTOM PC BUILDER">
+
+
+    <meta name="description" content="Use the PC builder and go step-by-step through each component in your build. Compatibility guaranteed, whether you’re building a top-tier showpiece or building on a budget.">
+
+
+    <meta property="og:title" content="Custom PC Builder | PC Build Guide | CORSAIR">
+
+    <meta property="og:description" content="Use the PC builder and go step-by-step through each component in your build. Compatibility guaranteed, whether you’re building a top-tier showpiece or building on a budget.">
+
+    <meta property="og:url" content="https://www.corsair.com/us/en/pc-builder/">
+
+    <meta property="og:image" content="/pc-builder/img/preview.jpg">
+        
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" media="all" href="/pc-builder/img/favicon.ico">
+
+        <!-- Styles -->
+        <link rel="stylesheet" href="/pc-builder/css/app.css?id=dac6a144b1e4cae2b585" type="text/css">
+        <script type="text/javascript" src="/pc-builder/js/app.js?id=e0fa3a3db2b7a66b1bc4" defer></script>
+
+        
+                    <!-- Google Tag Manager -->
+            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+						new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+					j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+					'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+				})(window,document,'script','dataLayer', 'GTM-WDBQWFS');</script>
+            <!-- End Google Tag Manager -->
+            </head>
+    <body>
+                    <!-- Google Tag Manager (noscript) -->
+            <noscript>
+                <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WDBQWFS" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+            </noscript>
+            <!-- End Google Tag Manager (noscript) -->
+        
+        
+        <div id="app">
+            <!-- route outlet -->
+            <!-- component matched by the route will render here -->
+            <router-view></router-view>
+        </div>
+
+        <script>
+            window.configuratorType = "0";
+            window.regionFallback = "us";
+            window.regions = JSON.parse('["br","ca","cn","eu","fr","de","ww","it","jp","kr","lm","pl","pt","ru","es","tw","uk","us"]');
+            window.languageFallback = "en";
+            window.languages = JSON.parse('["en","de","es","fr","it","ko","pt","ru","zh","ja","pl","tw"]');
+            window.welcomePage = "welcome";
+            window.corsair_base_url = "https://www.corsair.com";
+            				window.gtmCode = "GTM-WDBQWFS";
+                    </script>
+    </body>
+</html>

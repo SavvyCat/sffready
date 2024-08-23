@@ -11,7 +11,7 @@ export default function Home() {
   const [searchText, setSearchText] = useState("");
   const [gpus, setGpus] = useState([]);
   const [selectedGpu, setSelectedGpu] = useState(null); // State to hold the selected GPU
-  const [visibleCount, setVisibleCount] = useState(4);
+  const [visibleCount, setVisibleCount] = useState(8);
 
   const loadMore = () => {
     setVisibleCount((prevCount) => prevCount + 4);
@@ -59,7 +59,7 @@ export default function Home() {
     setHeight(gpuItem.height); // Assuming `height` is a property of the GPU
     setThickness(gpuItem.thickness); // Assuming `thickness` is a property of the GPU
   };
-  const gpuimagelocation=`/images-gpu/${selectedGpu?.image_id}.jpg`
+  const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
@@ -116,7 +116,7 @@ export default function Home() {
               </div>
               <div className="flex flex-col justify-center items-center">
                 <label className="block text-lg font-bold text-gray-700">
-                  Thickness(slots)
+                  Thickness (slots)
                 </label>
                 <input
                   type="number"
@@ -150,13 +150,12 @@ export default function Home() {
                         className="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-200"
                         onClick={() => handleGpuSelection(gpuItem)} // Select GPU on click
                       >
-                        {gpuItem.title}{" "}
-                        {/* Adjust this to match your GPU property name */}
+                        {gpuItem.title}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500">No GPUs found.</p>
+                  <p className="text-gray-500">Check your GPU dimensions to see a list of compatible cases.</p>
                 )}
               </div>
             </div>

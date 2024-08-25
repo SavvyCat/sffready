@@ -51,34 +51,6 @@ export default function Home() {
       //setSelectedGpu(null);
     }
   };
-  const handleGpuSelection = (gpuItem) => {
-    // Set the selected GPU and update dimensions
-    setSearchText(gpuItem.title);
-    setSelectedGpu(gpuItem);
-    setLength(gpuItem.length); // Assuming `length` is a property of the GPU
-    setHeight(gpuItem.height); // Assuming `height` is a property of the GPU
-    setThickness(gpuItem.thickness); // Assuming `thickness` is a property of the GPU
-  };
-  const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
-    useEffect(() => {
-    // Dynamically load the Buy Me a Coffee script
-    const script = document.createElement("script");
-    script.src = "https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js";
-    script.async = true;
-    script.setAttribute("data-name", "bmc-button");
-    script.setAttribute("data-slug", "DanielOliveira");
-    script.setAttribute("data-color", "#5F7FFF");
-    script.setAttribute("data-emoji", "");
-    script.setAttribute("data-font", "Arial");
-    script.setAttribute("data-text", "Buy Creator Coffee");
-    script.setAttribute("data-outline-color", "#000000");
-    script.setAttribute("data-font-color", "#ffffff");
-    script.setAttribute("data-coffee-color", "#FFDD00");
-
-    // Append the script to the container
-    const buttonContainer = document.getElementById("bmc-container");
-    buttonContainer.appendChild(script);
-
     return () => {
       buttonContainer.removeChild(script);
     };

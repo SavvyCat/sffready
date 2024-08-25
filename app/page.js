@@ -55,7 +55,8 @@ export default function Home() {
       buttonContainer.removeChild(script);
     };
   }, []);
-  return (
+  
+return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
         <h1 className="font-bold sm:text-7xl text-5xl flex justify-center items-center mt-20">

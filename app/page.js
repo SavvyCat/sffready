@@ -51,12 +51,16 @@ export default function Home() {
       //setSelectedGpu(null);
     }
   };
-    return () => {
-      buttonContainer.removeChild(script);
-    };
-  }, []);
-  
-return (
+
+  const handleGpuSelection = (gpuItem) => {
+    // Set the selected GPU and update dimensions
+    setSelectedGpu(gpuItem);
+    setLength(gpuItem.length); // Assuming `length` is a property of the GPU
+    setHeight(gpuItem.height); // Assuming `height` is a property of the GPU
+    setThickness(gpuItem.thickness); // Assuming `thickness` is a property of the GPU
+  };
+  const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
+  return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
         <h1 className="font-bold sm:text-7xl text-5xl flex justify-center items-center mt-20">

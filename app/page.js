@@ -2,7 +2,6 @@
 import getFilteredCases from "@/Backend/Data/GetDataBasesOn";
 import getFilteredGPUs from "@/Backend/Data/GetGpu";
 import { useState, useEffect } from "react";
-import { Analytics } from "@vercel/analytics/react"
 
 export default function Home() {
   const [cases, setCases] = useState([]);

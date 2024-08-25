@@ -156,7 +156,7 @@ export default function Home() {
                     ))}
                   </ul>
                 ) : (
-                  <p class="text-gray-500">Check your GPU dimensions to see a list of compatible cases.</p>
+                  <p class="text-gray-500 center-text">Check your GPU dimensions to see a list of compatible cases.</p>
                 )}
               </div>
             </div>

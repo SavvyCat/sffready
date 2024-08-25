@@ -51,7 +51,6 @@ export default function Home() {
       //setSelectedGpu(null);
     }
   };
-
   const handleGpuSelection = (gpuItem) => {
     // Set the selected GPU and update dimensions
     setSearchText(gpuItem.title);
@@ -61,6 +60,20 @@ export default function Home() {
     setThickness(gpuItem.thickness); // Assuming `thickness` is a property of the GPU
   };
   const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js";
+    script.setAttribute("data-name", "bmc-button");
+    script.setAttribute("data-slug", "DanielOliveira");
+    script.setAttribute("data-color", "#5F7FFF");
+    script.setAttribute("data-emoji", "");
+    script.setAttribute("data-font", "Arial");
+    script.setAttribute("data-text", "Buy Creator Coffee");
+    script.setAttribute("data-outline-color", "#000000");
+    script.setAttribute("data-font-color", "#ffffff");
+    script.setAttribute("data-coffee-color", "#FFDD00");
+    document.body.appendChild(script);
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">

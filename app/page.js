@@ -116,7 +116,7 @@ export default function Home() {
         
         >
           
-          <h1 className="font-bold texl-xl">@sffready</h1>
+          <h1 className="font-bold texl-xl">@sffbuild</h1>
         </a>
       </div>
     );

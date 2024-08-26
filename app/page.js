@@ -14,7 +14,7 @@ export default function Home() {
   const [visibleCount, setVisibleCount] = useState(8);
 
   const loadMore = () => {
-    setVisibleCount((prevCount) => prevCount + 4);
+    setVisibleCount((prevCount) => prevCount + 8);
   };
 
   useEffect(() => {

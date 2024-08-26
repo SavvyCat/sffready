@@ -217,7 +217,7 @@ export default function Home() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 text-center">
                     Check your GPU dimensions to see a list of compatible cases.
                   </p>
                 )}

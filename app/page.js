@@ -2,7 +2,7 @@
 import getFilteredCases from "@/Backend/Data/GetDataBasesOn";
 import getFilteredGPUs from "@/Backend/Data/GetGpu";
 import { useState, useEffect } from "react";
-
+import { CiCoffeeCup } from "react-icons/ci";
 export default function Home() {
   const [cases, setCases] = useState([]);
   const [length, setLength] = useState(285);
@@ -26,23 +26,60 @@ export default function Home() {
   }, [length, height, thickness]);
 
   const handleLengthChange = (e) => {
-    const value = Number(e.target.value);
-    if (value >= 0) setLength(value);
+    let value = e.target.value;
+    //console.log(value)
+    // Remove all leading zeros unless the entire input is "0"
+    value = value.replace(/^0+/, "");
+    //console.log(value)
+    // Remove any negative signs
+    value = value.replace(/-/g, "");
+    //console.log(value)
+    // If the field becomes empty after removing zeros, reset it to "0"
+    if (value === "") {
+      value = "0";
+    }
+
+    setLength(value); // Convert to a number and set the state
   };
 
   const handleHeightChange = (e) => {
-    const value = Number(e.target.value);
-    if (value >= 0) setHeight(value);
+    let value = e.target.value;
+    //console.log(value)
+    // Remove all leading zeros unless the entire input is "0"
+    value = value.replace(/^0+/, "");
+    //console.log(value)
+    // Remove any negative signs
+    value = value.replace(/-/g, "");
+    //console.log(value)
+    // If the field becomes empty after removing zeros, reset it to "0"
+    if (value === "") {
+      value = "0";
+    }
+
+    setHeight(value); // Convert to a number and set the state
   };
 
   const handleThicknessChange = (e) => {
-    const value = Number(e.target.value);
-    if (value >= 0) setThickness(value);
+    let value = e.target.value;
+    //console.log(value)
+    // Remove all leading zeros unless the entire input is "0"
+    value = value.replace(/^0+/, "");
+    //console.log(value)
+    // Remove any negative signs
+    value = value.replace(/-/g, "");
+    //console.log(value)
+    // If the field becomes empty after removing zeros, reset it to "0"
+    if (value === "") {
+      value = "0";
+    }
+
+    setThickness(value); // Convert to a number and set the state
   };
 
   const handleSearchChange = async (e) => {
     const value = e.target.value;
     setSearchText(value);
+
     if (value) {
       const filteredGpus = await getFilteredGPUs(value);
       setGpus(filteredGpus);
@@ -53,13 +90,38 @@ export default function Home() {
   };
 
   const handleGpuSelection = (gpuItem) => {
-    // Set the selected GPU and update dimensions
+    setSearchText(gpuItem.title);
     setSelectedGpu(gpuItem);
-    setLength(gpuItem.length); // Assuming `length` is a property of the GPU
-    setHeight(gpuItem.height); // Assuming `height` is a property of the GPU
-    setThickness(gpuItem.thickness); // Assuming `thickness` is a property of the GPU
+    setLength(gpuItem.length);
+    setHeight(gpuItem.height);
+    setThickness(gpuItem.thickness);
   };
   const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
+
+  const BuyMeACoffeeButton = () => {
+    return (
+      <div className="flex items-center justify-center gap-5">
+        <h1 className="font-bold texl-xl">Support Us</h1>
+        <a
+          href="https://buymeacoffee.com/danieloliveira"
+          className="bg-blue-500 text-white p-3 border rounded-lg text-lg flex gap-2 font-semibold hover:bg-blue-700"
+        >
+          <div className="flex justify-center items-center">
+            <CiCoffeeCup size={35} />
+          </div>
+          <h1 className="text-center mt-0.5 ">Buy Creator Coffee</h1>
+        </a>
+        <a
+          href="https://www.instagram.com/sffbuild"
+        
+        >
+          
+          <h1 className="font-bold texl-xl">@sffready</h1>
+        </a>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
@@ -99,7 +161,7 @@ export default function Home() {
                   value={length}
                   min="0"
                   onChange={handleLengthChange}
-                  className="mt-1 block w-2/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="text-center mt-1 block w-2/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
               <div className="flex flex-col justify-center items-center">
@@ -111,7 +173,7 @@ export default function Home() {
                   value={height}
                   min="0"
                   onChange={handleHeightChange}
-                  className="mt-1 block w-2/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="text-center mt-1 block w-2/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
               <div className="flex flex-col justify-center items-center">
@@ -123,7 +185,7 @@ export default function Home() {
                   value={thickness}
                   min="0"
                   onChange={handleThicknessChange}
-                  className="mt-1 block w-2/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="text-center mt-1 block w-2/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -155,15 +217,17 @@ export default function Home() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500">Check your GPU dimensions to see a list of compatible cases.</p>
+                  <p className="text-gray-500">
+                    Check your GPU dimensions to see a list of compatible cases.
+                  </p>
                 )}
               </div>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {cases.slice(0, visibleCount).map((caseItem, index) => {
-              //const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
-              const imagelocation1 = `https://github.com/MariooY2/Redditfreelance4/blob/main/public/images/${caseItem.image_id}/1.jpg?raw=true`;
+              const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
+              //const imagelocation1 = `https://github.com/MariooY2/Redditfreelance4/blob/main/public/images/${caseItem.image_id}/1.jpg?raw=true`;
               return (
                 <div
                   key={index}
@@ -193,6 +257,7 @@ export default function Home() {
               </button>
             </div>
           )}
+          {visibleCount > 8 && <BuyMeACoffeeButton />}
         </div>
       </div>
     </div>

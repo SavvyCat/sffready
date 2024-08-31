@@ -89,6 +89,38 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    // Adding the Google Analytics script to the head
+    const script1 = document.createElement("script");
+    script1.src = `https://www.googletagmanager.com/gtag/js?id=G-7BZ2TFND29`;
+    script1.async = true;
+    document.head.appendChild(script1);
+
+    const script2 = document.createElement("script");
+    script2.innerHTML = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-7BZ2TFND29');
+    `;
+    document.head.appendChild(script2);
+
+    // Track route changes (optional for SPAs)
+    const handleRouteChange = (url) => {
+      window.gtag("config", "G-7BZ2TFND29", {
+        page_path: url,
+      });
+    };
+
+    // Listen to route changes
+    window.addEventListener("routeChangeComplete", handleRouteChange);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("routeChangeComplete", handleRouteChange);
+    };
+  }, []);
+
   const handleGpuSelection = (gpuItem) => {
     setSearchText(gpuItem.title);
     setSelectedGpu(gpuItem);

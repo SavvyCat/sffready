@@ -108,7 +108,7 @@ export default function Home() {
     // Track route changes (optional for SPAs)
     const handleRouteChange = (url) => {
       window.gtag("config", "G-7BZ2TFND29", {
-        page_path: url
+        page_path: url,
       });
     };
 

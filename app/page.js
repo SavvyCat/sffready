@@ -123,6 +123,14 @@ export default function Home() {
           <a href="https://www.instagram.com/sffbuild">
             <h1 className="font-bold texl-xl">@sffbuild</h1>
           </a>
+        </div>
+        {/*<div className="border-8 border-black mt-6 h-44 w-full">
+          <img
+            src="https://via.placeholder.com/300"
+            alt="Placeholder"
+            className="w-full h-full object-cover"
+          />
+        </div>*/}
       </>
     );
   };

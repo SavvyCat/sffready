@@ -3,6 +3,7 @@ import getFilteredCases from "@/Backend/Data/GetDataBasesOn";
 import getFilteredGPUs from "@/Backend/Data/GetGpu";
 import { useState, useEffect } from "react";
 import { CiCoffeeCup } from "react-icons/ci";
+
 export default function Home() {
   const [cases, setCases] = useState([]);
   const [length, setLength] = useState(285);
@@ -12,6 +13,7 @@ export default function Home() {
   const [gpus, setGpus] = useState([]);
   const [selectedGpu, setSelectedGpu] = useState(null); // State to hold the selected GPU
   const [visibleCount, setVisibleCount] = useState(8);
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const loadMore = () => {
     setVisibleCount((prevCount) => prevCount + 8);
@@ -25,68 +27,47 @@ export default function Home() {
     getData();
   }, [length, height, thickness]);
 
-  const handleLengthChange = (e) => {
-    let value = e.target.value;
-    //console.log(value)
-    // Remove all leading zeros unless the entire input is "0"
-    value = value.replace(/^0+/, "");
-    //console.log(value)
-    // Remove any negative signs
-    value = value.replace(/-/g, "");
-    //console.log(value)
-    // If the field becomes empty after removing zeros, reset it to "0"
-    if (value === "") {
-      value = "0";
-    }
-
-    setLength(value); // Convert to a number and set the state
-  };
-
-  const handleHeightChange = (e) => {
-    let value = e.target.value;
-    //console.log(value)
-    // Remove all leading zeros unless the entire input is "0"
-    value = value.replace(/^0+/, "");
-    //console.log(value)
-    // Remove any negative signs
-    value = value.replace(/-/g, "");
-    //console.log(value)
-    // If the field becomes empty after removing zeros, reset it to "0"
-    if (value === "") {
-      value = "0";
-    }
-
-    setHeight(value); // Convert to a number and set the state
-  };
-
-  const handleThicknessChange = (e) => {
-    let value = e.target.value;
-    //console.log(value)
-    // Remove all leading zeros unless the entire input is "0"
-    value = value.replace(/^0+/, "");
-    //console.log(value)
-    // Remove any negative signs
-    value = value.replace(/-/g, "");
-    //console.log(value)
-    // If the field becomes empty after removing zeros, reset it to "0"
-    if (value === "") {
-      value = "0";
-    }
-
-    setThickness(value); // Convert to a number and set the state
-  };
-
-  const handleSearchChange = async (e) => {
+  const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchText(value);
 
-    if (value) {
-      const filteredGpus = await getFilteredGPUs(value);
-      setGpus(filteredGpus);
-    } else {
-      setGpus([]); // Clear results if the search input is empty
-      //setSelectedGpu(null);
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
     }
+
+    const newTimeout = setTimeout(async () => {
+      if (value) {
+        const filteredGpus = await getFilteredGPUs(value);
+        setGpus(filteredGpus);
+      } else {
+        setGpus([]);
+      }
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
+  };
+
+  const handleLengthChange = (e) => {
+    let value = e.target.value.replace(/^0+/, "").replace(/-/g, "");
+    setLength(value === "" ? "0" : value);
+  };
+
+  const handleHeightChange = (e) => {
+    let value = e.target.value.replace(/^0+/, "").replace(/-/g, "");
+    setHeight(value === "" ? "0" : value);
+  };
+
+  const handleThicknessChange = (e) => {
+    let value = e.target.value.replace(/^0+/, "").replace(/-/g, "");
+    setThickness(value === "" ? "0" : value);
+  };
+
+  const handleGpuSelection = (gpuItem) => {
+    setSearchText(gpuItem.title);
+    setSelectedGpu(gpuItem);
+    setLength(gpuItem.length);
+    setHeight(gpuItem.height);
+    setThickness(gpuItem.thickness);
   };
 
   useEffect(() => {
@@ -121,39 +102,38 @@ export default function Home() {
     };
   }, []);
 
-  const handleGpuSelection = (gpuItem) => {
-    setSearchText(gpuItem.title);
-    setSelectedGpu(gpuItem);
-    setLength(gpuItem.length);
-    setHeight(gpuItem.height);
-    setThickness(gpuItem.thickness);
-  };
   const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
 
   const BuyMeACoffeeButton = () => {
     return (
-      <div className="flex items-center justify-center gap-5">
-        <h1 className="font-bold texl-xl">Support Us</h1>
-        <a
-          href="https://buymeacoffee.com/danieloliveira"
-          className="bg-blue-500 text-white p-3 border rounded-lg text-lg flex gap-2 font-semibold hover:bg-blue-700"
-        >
-          <div className="flex justify-center items-center">
-            <CiCoffeeCup size={35} />
-          </div>
-          <h1 className="text-center mt-0.5 ">Buy Creator Coffee</h1>
-        </a>
-        <a
-          href="https://www.instagram.com/sffbuild"
+      <>
+       
         
-        >
-          
-          <h1 className="font-bold texl-xl">@sffbuild</h1>
-        </a>
-      </div>
+        <div className="flex items-center justify-center gap-5">
+          <h1 className="font-bold texl-xl">Support Us</h1>
+          <a
+            href="https://buymeacoffee.com/danieloliveira"
+            className="bg-blue-500 text-white p-3 border rounded-lg text-lg flex gap-2 font-semibold hover:bg-blue-700"
+          >
+            <div className="flex justify-center items-center">
+              <CiCoffeeCup size={35} />
+            </div>
+            <h1 className="text-center mt-0.5 ">Buy Creator Coffee</h1>
+          </a>
+          <a href="https://www.instagram.com/sffbuild">
+            <h1 className="font-bold texl-xl">@sffbuild</h1>
+          </a>
+        </div>
+        <div className="border-8 border-black mt-6 h-44 w-full">
+          <img
+            src="https://via.placeholder.com/300"
+            alt="Placeholder"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </>
     );
   };
-
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
@@ -238,7 +218,7 @@ export default function Home() {
               <div className="bg-gray-100 p-4 rounded-lg shadow-inner max-h-64 overflow-y-auto">
                 {gpus.length && searchText.length > 0 ? (
                   <ul>
-                    {gpus.map((gpuItem, index) => (
+                    {gpus?.map((gpuItem, index) => (
                       <li
                         key={index}
                         className="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-200"

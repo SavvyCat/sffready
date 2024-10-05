@@ -3,6 +3,7 @@ import getFilteredCases from "@/Backend/Data/GetDataBasesOn";
 import getFilteredGPUs from "@/Backend/Data/GetGpu";
 import { useState, useEffect } from "react";
 import { CiCoffeeCup } from "react-icons/ci";
+
 export default function Home() {
   const [cases, setCases] = useState([]);
   const [length, setLength] = useState(285);
@@ -12,9 +13,10 @@ export default function Home() {
   const [gpus, setGpus] = useState([]);
   const [selectedGpu, setSelectedGpu] = useState(null); // State to hold the selected GPU
   const [visibleCount, setVisibleCount] = useState(8);
+  const [debounceTimeout, setDebounceTimeout] = useState(null);
 
   const loadMore = () => {
-    setVisibleCount((prevCount) => prevCount + 4);
+    setVisibleCount((prevCount) => prevCount + 8);
   };
 
   useEffect(() => {
@@ -25,68 +27,39 @@ export default function Home() {
     getData();
   }, [length, height, thickness]);
 
-  const handleLengthChange = (e) => {
-    let value = e.target.value;
-    //console.log(value)
-    // Remove all leading zeros unless the entire input is "0"
-    value = value.replace(/^0+/, "");
-    //console.log(value)
-    // Remove any negative signs
-    value = value.replace(/-/g, "");
-    //console.log(value)
-    // If the field becomes empty after removing zeros, reset it to "0"
-    if (value === "") {
-      value = "0";
-    }
-
-    setLength(value); // Convert to a number and set the state
-  };
-
-  const handleHeightChange = (e) => {
-    let value = e.target.value;
-    //console.log(value)
-    // Remove all leading zeros unless the entire input is "0"
-    value = value.replace(/^0+/, "");
-    //console.log(value)
-    // Remove any negative signs
-    value = value.replace(/-/g, "");
-    //console.log(value)
-    // If the field becomes empty after removing zeros, reset it to "0"
-    if (value === "") {
-      value = "0";
-    }
-
-    setHeight(value); // Convert to a number and set the state
-  };
-
-  const handleThicknessChange = (e) => {
-    let value = e.target.value;
-    //console.log(value)
-    // Remove all leading zeros unless the entire input is "0"
-    value = value.replace(/^0+/, "");
-    //console.log(value)
-    // Remove any negative signs
-    value = value.replace(/-/g, "");
-    //console.log(value)
-    // If the field becomes empty after removing zeros, reset it to "0"
-    if (value === "") {
-      value = "0";
-    }
-
-    setThickness(value); // Convert to a number and set the state
-  };
-
-  const handleSearchChange = async (e) => {
+  const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchText(value);
 
-    if (value) {
-      const filteredGpus = await getFilteredGPUs(value);
-      setGpus(filteredGpus);
-    } else {
-      setGpus([]); // Clear results if the search input is empty
-      //setSelectedGpu(null);
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
     }
+
+    const newTimeout = setTimeout(async () => {
+      if (value) {
+        const filteredGpus = await getFilteredGPUs(value);
+        setGpus(filteredGpus);
+      } else {
+        setGpus([]);
+      }
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
+  };
+
+  const handleLengthChange = (e) => {
+    let value = e.target.value.replace(/^0+/, "").replace(/-/g, "");
+    setLength(value === "" ? "0" : value);
+  };
+
+  const handleHeightChange = (e) => {
+    let value = e.target.value.replace(/^0+/, "").replace(/-/g, "");
+    setHeight(value === "" ? "0" : value);
+  };
+
+  const handleThicknessChange = (e) => {
+    let value = e.target.value.replace(/^0+/, "").replace(/-/g, "");
+    setThickness(value === "" ? "0" : value);
   };
 
   const handleGpuSelection = (gpuItem) => {
@@ -96,6 +69,39 @@ export default function Home() {
     setHeight(gpuItem.height);
     setThickness(gpuItem.thickness);
   };
+
+  useEffect(() => {
+    // Adding the Google Analytics script to the head
+    const script1 = document.createElement("script");
+    script1.src = `https://www.googletagmanager.com/gtag/js?id=G-7BZ2TFND29`;
+    script1.async = true;
+    document.head.appendChild(script1);
+
+    const script2 = document.createElement("script");
+    script2.innerHTML = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-7BZ2TFND29');
+    `;
+    document.head.appendChild(script2);
+
+    // Track route changes (optional for SPAs)
+    const handleRouteChange = (url) => {
+      window.gtag("config", "G-7BZ2TFND29", {
+        page_path: url,
+      });
+    };
+
+    // Listen to route changes
+    window.addEventListener("routeChangeComplete", handleRouteChange);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("routeChangeComplete", handleRouteChange);
+    };
+  }, []);
+
   const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
 
   const BuyMeACoffeeButton = () => {
@@ -111,17 +117,12 @@ export default function Home() {
           </div>
           <h1 className="text-center mt-0.5 ">Buy Creator Coffee</h1>
         </a>
-        <a
-          href="https://www.instagram.com/sffbuild"
-        
-        >
-          
-          <h1 className="font-bold texl-xl">@sffready</h1>
+        <a href="https://www.instagram.com/sffbuild">
+          <h1 className="font-bold texl-xl">@sffbuild</h1>
         </a>
       </div>
     );
   };
-
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
@@ -206,7 +207,7 @@ export default function Home() {
               <div className="bg-gray-100 p-4 rounded-lg shadow-inner max-h-64 overflow-y-auto">
                 {gpus.length && searchText.length > 0 ? (
                   <ul>
-                    {gpus.map((gpuItem, index) => (
+                    {gpus?.map((gpuItem, index) => (
                       <li
                         key={index}
                         className="p-2 border-b border-gray-300 cursor-pointer hover:bg-gray-200"
@@ -217,7 +218,7 @@ export default function Home() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 text-center">
                     Check your GPU dimensions to see a list of compatible cases.
                   </p>
                 )}
@@ -258,6 +259,13 @@ export default function Home() {
             </div>
           )}
           {visibleCount > 8 && <BuyMeACoffeeButton />}
+        </div>
+        <div className="border-8 border-black mt-6 h-44">
+          <img
+            src="https://via.placeholder.com/300"
+            alt="Placeholder"
+            className="w-full h-full object-cover"
+          />
         </div>
       </div>
     </div>

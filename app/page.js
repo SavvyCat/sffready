@@ -123,11 +123,11 @@ export default function Home() {
           </a>
         </div>
         <a href="https://clack-attack.com/">
-          <div className="border-4 border-black h-44 w-full">
+          <div className="border-4 border-black h-48 w-full">
             <img
               src="/Clack_Attack_ad.png"
               alt="Placeholder"
-              className="w-full h-full object-fit"
+              className="w-full h-full object-contain"
             />
           </div>
         </a>
@@ -142,7 +142,7 @@ export default function Home() {
         </h1>
       </div>
       <div className="mb-[2rem]"></div>
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl z-10">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-5xl z-10">
         <div className="flex justify-center lg:mb-10 mb-20 mt-32">
           {" "}
           {/* Adjusted margin-top to push content down */}

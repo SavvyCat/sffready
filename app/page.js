@@ -106,21 +106,32 @@ export default function Home() {
 
   const BuyMeACoffeeButton = () => {
     return (
-      <div className="flex items-center justify-center gap-5">
-        <h1 className="font-bold texl-xl">Support Us</h1>
-        <a
-          href="https://buymeacoffee.com/danieloliveira"
-          className="bg-blue-500 text-white p-3 border rounded-lg text-lg flex gap-2 font-semibold hover:bg-blue-700"
-        >
-          <div className="flex justify-center items-center">
-            <CiCoffeeCup size={35} />
+      <>
+        <div className="flex items-center justify-center gap-5">
+          <h1 className="font-bold texl-xl">Support Us</h1>
+          <a
+            href="https://buymeacoffee.com/danieloliveira"
+            className="bg-blue-500 text-white p-3 border rounded-lg text-lg flex gap-2 font-semibold hover:bg-blue-700"
+          >
+            <div className="flex justify-center items-center">
+              <CiCoffeeCup size={35} />
+            </div>
+            <h1 className="text-center mt-0.5 ">Buy Creator Coffee</h1>
+          </a>
+          <a href="https://www.instagram.com/sffbuild">
+            <h1 className="font-bold texl-xl">@sffbuild</h1>
+          </a>
+        </div>
+        <a href="https://clack-attack.com/">
+          <div className="border-4 border-black h-44 w-full">
+            <img
+              src="/Clack_Attack_ad.png"
+              alt="Placeholder"
+              className="w-full h-full object-fit"
+            />
           </div>
-          <h1 className="text-center mt-0.5 ">Buy Creator Coffee</h1>
         </a>
-        <a href="https://www.instagram.com/sffbuild">
-          <h1 className="font-bold texl-xl">@sffbuild</h1>
-        </a>
-      </div>
+      </>
     );
   };
   return (
@@ -259,13 +270,6 @@ export default function Home() {
             </div>
           )}
           {visibleCount > 8 && <BuyMeACoffeeButton />}
-        </div>
-        <div className="border-8 border-black mt-6 h-44">
-          <img
-            src="https://via.placeholder.com/300"
-            alt="Placeholder"
-            className="w-full h-full object-cover"
-          />
         </div>
       </div>
     </div>

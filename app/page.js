@@ -123,7 +123,7 @@ export default function Home() {
           </a>
         </div>
         <a href="https://clack-attack.com/">
-          <div className="border-4 border-black h-48 w-full">
+          <div className=" h-48 w-full">
             <img
               src="/Clack_Attack_ad.png"
               alt="Placeholder"

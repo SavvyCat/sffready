@@ -111,7 +111,7 @@ export default function Home() {
           <h1 className="font-bold texl-xl">Support Us</h1>
           <a
             href="https://buymeacoffee.com/danieloliveira"
-            className="bg-blue-500 text-white p-3 border rounded-lg text-lg flex gap-2 font-semibold hover:bg-blue-700"
+            className="bg-blue-500 text-white p-2 border rounded-lg text-lg flex gap-2 font-semibold hover:bg-blue-700"
           >
             <div className="flex justify-center items-center">
               <CiCoffeeCup size={35} />

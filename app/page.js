@@ -116,7 +116,7 @@ export default function Home() {
             <div className="flex justify-center items-center">
               <CiCoffeeCup size={35} />
             </div>
-            <h1 className="text-center mt-0.5 ">Buy Creator Coffee</h1>
+            <h1 className="text-center mt-0.5 ">Buy Creator Coffee  </h1>
           </a>
           <a href="https://www.instagram.com/sffbuild">
             <h1 className="font-bold texl-xl">@sffbuild</h1>

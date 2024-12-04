@@ -1,7 +1,8 @@
 "use client";
+import React, { useState, useEffect } from "react"; // Ensure to import React
+import Modal from "./Modal"; // Adjust the path if needed
 import getFilteredCases from "@/Backend/Data/GetDataBasesOn";
 import getFilteredGPUs from "@/Backend/Data/GetGpu";
-import { useState, useEffect } from "react";
 import { CiCoffeeCup } from "react-icons/ci";
 
 export default function Home() {
@@ -11,9 +12,13 @@ export default function Home() {
   const [thickness, setThickness] = useState(2);
   const [searchText, setSearchText] = useState("");
   const [gpus, setGpus] = useState([]);
-  const [selectedGpu, setSelectedGpu] = useState(null); // State to hold the selected GPU
+  const [selectedGpu, setSelectedGpu] = useState(null);
   const [visibleCount, setVisibleCount] = useState(8);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalUrl, setModalUrl] = useState("");
 
   const loadMore = () => {
     setVisibleCount((prevCount) => prevCount + 8);
@@ -70,43 +75,24 @@ export default function Home() {
     setThickness(gpuItem.thickness);
   };
 
-  useEffect(() => {
-    // Adding the Google Analytics script to the head
-    const script1 = document.createElement("script");
-    script1.src = `https://www.googletagmanager.com/gtag/js?id=G-7BZ2TFND29`;
-    script1.async = true;
-    document.head.appendChild(script1);
+  // Function to open modal
+  const openModal = (url) => {
+    setModalUrl(url);
+    setIsModalOpen(true);
+  };
 
-    const script2 = document.createElement("script");
-    script2.innerHTML = `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-7BZ2TFND29');
-    `;
-    document.head.appendChild(script2);
-
-    // Track route changes (optional for SPAs)
-    const handleRouteChange = (url) => {
-      window.gtag("config", "G-7BZ2TFND29", {
-        page_path: url,
-      });
-    };
-
-    // Listen to route changes
-    window.addEventListener("routeChangeComplete", handleRouteChange);
-
-    // Cleanup event listener on unmount
-    return () => {
-      window.removeEventListener("routeChangeComplete", handleRouteChange);
-    };
-  }, []);
+  // Function to close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalUrl(""); // Clear the URL when closing
+  };
 
   const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
 
   const BuyMeACoffeeButton = () => {
     return (
       <>
+        {" "}
         <div className="flex items-center justify-center gap-5">
           <h1 className="font-bold texl-xl">Support Us</h1>
           <a
@@ -134,8 +120,9 @@ export default function Home() {
       </>
     );
   };
+
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-100  relative ">
+    <div className="flex flex-col items-center justify-center bg-gray-100 relative ">
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
         <h1 className="font-bold sm:text-7xl text-5xl flex justify-center items-center mt-20">
           SFF Ready?
@@ -144,8 +131,6 @@ export default function Home() {
       <div className="mb-[2rem]"></div>
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-5xl z-10">
         <div className="flex justify-center lg:mb-10 mb-20 mt-32">
-          {" "}
-          {/* Adjusted margin-top to push content down */}
           {selectedGpu ? (
             <img
               src={gpuimagelocation}
@@ -239,19 +224,17 @@ export default function Home() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {cases.slice(0, visibleCount).map((caseItem, index) => {
               const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
-              //const imagelocation1 = `https://github.com/MariooY2/Redditfreelance4/blob/main/public/images/${caseItem.image_id}/1.jpg?raw=true`;
               return (
                 <div
                   key={index}
                   className="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300"
                 >
-                  <a href={caseItem.url}>
-                    <img
-                      src={imagelocation1}
-                      alt={`Case Image ${index + 1}`}
-                      className="w-full h-48 object-cover bg-slate-200"
-                    />
-                  </a>
+                  <img
+                    src={imagelocation1}
+                    alt={`Case Image ${index + 1}`}
+                    className="w-full h-48 object-cover bg-slate-200 cursor-pointer"
+                    onClick={() => openModal(caseItem.url)} // Open modal on image click
+                  />
                   <p className="flex justify-center items-center text-sm">
                     {caseItem.product_name}
                   </p>
@@ -272,6 +255,9 @@ export default function Home() {
           {visibleCount > 8 && <BuyMeACoffeeButton />}
         </div>
       </div>
+
+      {/* Modal Component */}
+      <Modal isOpen={isModalOpen} onClose={closeModal} url={modalUrl} />
     </div>
   );
 }

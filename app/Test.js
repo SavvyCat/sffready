@@ -7,7 +7,7 @@ const CaseEndComponent = ({ data, id }) => {
       <main className="sm:px-2">
         <div className="max-w-7xl flex flex-wrap sm:flex-nowrap xl:mx-auto">
           <div className="w-full py-4 mx-2 sm:mx-0">
-            <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 ">
+            <div className="grid grid-cols-1 gap-2">
               <div className="flex flex-col justify-between">
                 <div className="flex border-2 border-black h-full justify-center items-center">
                   <div className="max-h-96 flex justify-center w-full h-full">
@@ -225,13 +225,19 @@ const CaseEndComponent = ({ data, id }) => {
                       <td colSpan="2">{data.modes.results[0].cpu_height}</td>
                       <td colSpan="2">
                         {data.modes.results[0].l240 && (
-                          <span className="badge bg-zinc-600">240MM</span>
+                          <span className="badge bg-zinc-600 text-white p-0.5 m-1 text-sm">
+                            240MM
+                          </span>
                         )}
                         {data.modes.results[0].l280 && (
-                          <span className="badge bg-zinc-600">280MM</span>
+                          <span className="badge bg-zinc-600 text-white p-0.5 m-1 text-sm">
+                            280MM
+                          </span>
                         )}
                         {data.modes.results[0].l360 && (
-                          <span className="badge bg-zinc-600">360MM</span>
+                          <span className="badge bg-zinc-600 text-white p-0.5 m-1 text-sm">
+                            360MM
+                          </span>
                         )}
                       </td>
                     </tr>

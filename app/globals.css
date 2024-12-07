@@ -2,3 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  border-radius: 50%;
+  display: inline-block;
+  border-style: solid;
+  border-width: 4px;
+  animation: spin 1s linear infinite;
+}
+
+table {
+  border: 2px solid black;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: center;
+  border: 1px solid black;
+}

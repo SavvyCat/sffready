@@ -19,6 +19,7 @@ export default function Home() {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState("");
+  const [id, setid] = useState(null);
 
   const loadMore = () => {
     setVisibleCount((prevCount) => prevCount + 8);
@@ -76,8 +77,9 @@ export default function Home() {
   };
 
   // Function to open modal
-  const openModal = (url) => {
+  const openModal = (url, id) => {
     setModalUrl(url);
+    setid(id);
     setIsModalOpen(true);
   };
 
@@ -233,7 +235,7 @@ export default function Home() {
                     src={imagelocation1}
                     alt={`Case Image ${index + 1}`}
                     className="w-full h-48 object-cover bg-slate-200 cursor-pointer"
-                    onClick={() => openModal(caseItem.url)} // Open modal on image click
+                    onClick={() => openModal(caseItem.url, caseItem.image_id)} // Open modal on image click
                   />
                   <p className="flex justify-center items-center text-sm">
                     {caseItem.product_name}
@@ -257,7 +259,7 @@ export default function Home() {
       </div>
 
       {/* Modal Component */}
-      <Modal isOpen={isModalOpen} onClose={closeModal} url={modalUrl} />
+      <Modal isOpen={isModalOpen} onClose={closeModal} url={modalUrl} id={id} />
     </div>
   );
 }

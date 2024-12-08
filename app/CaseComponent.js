@@ -1,7 +1,4 @@
-import React from "react";
-
 const CaseEndComponent = ({ data, id }) => {
-  console.log(data);
   return (
     <>
       <main className="sm:px-2">

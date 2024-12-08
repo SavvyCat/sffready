@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import CaseDetails from "./CaseDetails";
-import CaseEndComponent from "./Test";
+import CaseEndComponent from "./CaseComponent";
 
 const Modal = ({ isOpen, onClose, url, id }) => {
   const [data, setData] = useState(null);

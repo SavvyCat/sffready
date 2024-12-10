@@ -234,7 +234,7 @@ export default function Home() {
                   <img
                     src={imagelocation1}
                     alt={`Case Image ${index + 1}`}
-                    className="w-full h-48 object-cover bg-slate-200 cursor-pointer"
+                    className="w-full h-48 object-fit bg-slate-200 cursor-pointer"
                     onClick={() => openModal(caseItem.url, caseItem.image_id)} // Open modal on image click
                   />
                   <p className="flex justify-center items-center text-sm">

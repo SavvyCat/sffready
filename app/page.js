@@ -48,7 +48,7 @@ export default function Home() {
       } else {
         setGpus([]);
       }
-    }, 500);
+    }, 1000);
 
     setDebounceTimeout(newTimeout);
   };

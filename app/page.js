@@ -4,8 +4,43 @@ import Modal from "./Modal"; // Adjust the path if needed
 import getFilteredCases from "@/Backend/Data/GetDataBasesOn";
 import getFilteredGPUs from "@/Backend/Data/GetGpu";
 import { CiCoffeeCup } from "react-icons/ci";
-
 export default function Home() {
+  const categorys = [
+    "ALL",
+    "NVIDIA",
+    "Matrox",
+    "ASRock",
+    "Sparkle",
+    "GUNNIR",
+    "Intel",
+    "Colorful",
+    "Leadtek",
+    "MSI",
+    "Galax",
+    "EVGA",
+    "KFA2",
+    "ASUS",
+    "Gainward",
+    "Gigabyte",
+    "Onda",
+    "Palit",
+    "Zotac",
+    "Biostar",
+    "INNO3D",
+    "MAXSUN",
+    "KUROUTOSHIKOU",
+    "Manli",
+    "Yeston",
+    "PNY",
+    "ELSA",
+    "Point Of View",
+    "Zogis",
+    "Huananzhi",
+    "CORSAIR",
+    "ASL",
+    "emTek",
+  ];
+
   const [cases, setCases] = useState([]);
   const [length, setLength] = useState(285);
   const [height, setHeight] = useState(112);
@@ -15,7 +50,7 @@ export default function Home() {
   const [selectedGpu, setSelectedGpu] = useState(null);
   const [visibleCount, setVisibleCount] = useState(8);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
-
+  const [selectedCategory, setSelectedCategory] = useState("EVGA");
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState("");
@@ -23,6 +58,17 @@ export default function Home() {
 
   const loadMore = () => {
     setVisibleCount((prevCount) => prevCount + 8);
+  };
+  const handleCategoryChange = async (e) => {
+    const newCategory = e.target.value;
+    setSelectedCategory(newCategory);
+
+    if (searchText) {
+      const filteredGpus = await getFilteredGPUs(searchText, newCategory);
+      setGpus(filteredGpus);
+    } else {
+      setGpus([]);
+    }
   };
 
   useEffect(() => {
@@ -43,7 +89,7 @@ export default function Home() {
 
     const newTimeout = setTimeout(async () => {
       if (value) {
-        const filteredGpus = await getFilteredGPUs(value);
+        const filteredGpus = await getFilteredGPUs(value, selectedCategory);
         setGpus(filteredGpus);
       } else {
         setGpus([]);
@@ -192,7 +238,7 @@ export default function Home() {
         </div>
         <div className="flex flex-col justify-center items-center gap-10">
           <div className="w-8/12">
-            <div className="mb-6">
+            <div className="mb-6 flex">
               <input
                 type="text"
                 value={searchText}
@@ -200,10 +246,21 @@ export default function Home() {
                 placeholder=" Search GPU"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
+              <select
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                className="mt-1 ml-2 block w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              >
+                {categorys.map((category, index) => (
+                  <option key={index} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="flex flex-col gap-10">
               <div className="bg-gray-100 p-4 rounded-lg shadow-inner max-h-64 overflow-y-auto">
-                {gpus.length && searchText.length > 0 ? (
+                {gpus?.length && searchText?.length > 0 ? (
                   <ul>
                     {gpus?.map((gpuItem, index) => (
                       <li

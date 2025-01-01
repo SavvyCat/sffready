@@ -6,7 +6,7 @@ import getFilteredGPUs from "@/Backend/Data/GetGpu";
 import { CiCoffeeCup } from "react-icons/ci";
 export default function Home() {
   const categorys = [
-    "ALL",
+    "All Brands",
     "NVIDIA",
     "Matrox",
     "ASRock",
@@ -50,7 +50,7 @@ export default function Home() {
   const [selectedGpu, setSelectedGpu] = useState(null);
   const [visibleCount, setVisibleCount] = useState(8);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("EVGA");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState("");
@@ -239,17 +239,11 @@ export default function Home() {
         <div className="flex flex-col justify-center items-center gap-10">
           <div className="w-8/12">
             <div className="mb-6 flex">
-              <input
-                type="text"
-                value={searchText}
-                onChange={handleSearchChange}
-                placeholder=" Search GPU"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
               <select
                 value={selectedCategory}
                 onChange={handleCategoryChange}
-                className="mt-1 ml-2 block w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 mr-2 block sm:w-1/4 w-4/6 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                style={{ maxHeight: "50%", overflowY: "auto" }} // Custom inline styles for height
               >
                 {categorys.map((category, index) => (
                   <option key={index} value={category}>
@@ -257,6 +251,13 @@ export default function Home() {
                   </option>
                 ))}
               </select>
+              <input
+                type="text"
+                value={searchText}
+                onChange={handleSearchChange}
+                placeholder=" Search GPU"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
             <div className="flex flex-col gap-10">
               <div className="bg-gray-100 p-4 rounded-lg shadow-inner max-h-64 overflow-y-auto">

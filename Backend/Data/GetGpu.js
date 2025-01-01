@@ -16,7 +16,7 @@ export default async function getFilteredGPUs(partialMatch, selectedCategory) {
   }
   const match = separateNumberAndCharacter(partialMatch);
 
-  if (selectedCategory === "ALL") {
+  if (selectedCategory === "All Brands") {
     let query = supabase.from("GPU").select("*").ilike("title", `%${match}%`);
 
     const { data, error } = await query;
@@ -38,7 +38,7 @@ export default async function getFilteredGPUs(partialMatch, selectedCategory) {
       .select("*")
       .eq("category", selectedCategory);
 
-      
+
     console.log(data2);
 
     if (error1) {

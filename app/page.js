@@ -50,7 +50,7 @@ export default function Home() {
   const [selectedGpu, setSelectedGpu] = useState(null);
   const [visibleCount, setVisibleCount] = useState(8);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const [selectedCategory, setSelectedCategory] = useState("All Brands");
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState("");

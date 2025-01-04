@@ -6,7 +6,8 @@ export default async function getFilteredCases(gpuLength, gpuHeight, gpuSlots) {
     .select("*")
     .gte("length", gpuLength)
     .gte("height", gpuHeight)
-    .gte("slots", gpuSlots);
+    .gte("slots", gpuSlots)
+    .order("length", { ascending: true });
 
   if (error) {
     console.error("Error fetching data:", error);
@@ -15,4 +16,3 @@ export default async function getFilteredCases(gpuLength, gpuHeight, gpuSlots) {
 
   return CASES;
 }
-//const imagelocation1 = `https://github.com/MariooY2/Redditfreelance4/blob/main/public/images/${caseItem.image_id}/1.jpg?raw=true`;

@@ -136,6 +136,26 @@ export default function Home() {
 
   const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=G-7BZ2TFND29`;
+    document.head.appendChild(script);
+
+    script.onload = () => {
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        window.dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-7BZ2TFND29");
+    };
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
   const BuyMeACoffeeButton = () => {
     return (
       <>

@@ -156,6 +156,26 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    // Function to send the GET request
+    const pingWebsite = async () => {
+      try {
+        const response = await fetch("https://store-three-ecru.vercel.app/", {
+          method: "GET",
+        });
+        if (response.ok) {
+          console.log("Website pinged successfully");
+        } else {
+          console.error("Failed to ping the website:", response.status);
+        }
+      } catch (error) {
+        console.error("Error pinging the website:", error);
+      }
+    };
+
+    pingWebsite();
+  }, []);
+
   const BuyMeACoffeeButton = () => {
     return (
       <>

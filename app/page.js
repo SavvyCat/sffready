@@ -156,26 +156,6 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    // Function to send the GET request
-    const pingWebsite = async () => {
-      try {
-        const response = await fetch("https://store-three-ecru.vercel.app/", {
-          method: "GET",
-        });
-        if (response.ok) {
-          console.log("Website pinged successfully");
-        } else {
-          console.error("Failed to ping the website:", response.status);
-        }
-      } catch (error) {
-        console.error("Error pinging the website:", error);
-      }
-    };
-
-    pingWebsite();
-  }, []);
-
   const BuyMeACoffeeButton = () => {
     return (
       <>
@@ -320,26 +300,28 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {cases.slice(0, visibleCount).map((caseItem, index) => {
-              const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
-              return (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300"
-                >
-                  <img
-                    src={imagelocation1}
-                    alt={`Case Image ${index + 1}`}
-                    className="w-full h-48 object-fit bg-slate-200 cursor-pointer"
-                    onClick={() => openModal(caseItem.url, caseItem.image_id)} // Open modal on image click
-                  />
-                  <p className="flex justify-center items-center text-sm">
-                    {caseItem.product_name}
-                  </p>
-                </div>
-              );
-            })}
+          <div className="max-w-[50rem]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {cases.slice(0, visibleCount).map((caseItem, index) => {
+                const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
+                return (
+                  <div
+                    key={index}
+                    className="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300"
+                  >
+                    <img
+                      src={imagelocation1}
+                      alt={`Case Image ${index + 1}`}
+                      className="w-full h-48 bg-slate-200 cursor-pointer"
+                      onClick={() => openModal(caseItem.url, caseItem.image_id)} // Open modal on image click
+                    />
+                    <p className="flex justify-center items-center text-sm">
+                      {caseItem.product_name}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           {visibleCount < cases.length && (
             <div className="flex justify-center mt-5">

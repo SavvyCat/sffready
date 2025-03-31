@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import CaseDetails from "./CaseDetails";
+import { useEffect, useState } from "react";
 import CaseEndComponent from "./CaseComponent";
 
 const Modal = ({ isOpen, onClose, url, id }) => {

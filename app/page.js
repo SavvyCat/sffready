@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react"; // Ensure to import React
-import Modal from "./Modal"; // Adjust the path if needed
 import getFilteredCases from "@/Backend/Data/GetDataBasesOn";
 import getFilteredGPUs from "@/Backend/Data/GetGpu";
+import { useEffect, useState } from "react"; // Ensure to import React
 import { CiCoffeeCup } from "react-icons/ci";
+import Modal from "../components/Modal"; // Adjust the path if needed
 export default function Home() {
   const categorys = [
     "ASL",
@@ -190,6 +190,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center bg-gray-100 relative ">
+
       <div className="absolute top-0 w-full flex justify-center items-center z-50">
         <h1 className="font-bold sm:text-7xl text-5xl flex justify-center items-center mt-20">
           SFF Ready?

@@ -1,68 +1,130 @@
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+// Allow streaming responses up to 60 seconds (increased from 30)
+export const maxDuration = 60;
 
 export async function POST(req) {
-  // Get JSON body from the request
-  const body = await req.json();
+  try {
+    // Get JSON body from the request
+    const body = await req.json();
 
-  // Extract messages and build parameters
-  const { messages, buildParams } = body;
-  
-  const { gpu, budget, useWebSearch = true } = buildParams || {};
+    // Extract messages and build parameters with better error handling
+    const { messages = [], buildParams = {} } = body;
+    const { gpu, budget, useWebSearch = true, selectedCase } = buildParams;
 
-  // Define system prompt
-  const systemPrompt = "You are a PC hardware expert who specializes in recommending balanced PC builds based on specific requirements. " +
-    "When generating a PC build, provide detailed component recommendations using the following consistent format:\n\n" +
-    "### 1. CPU\n" +
-    "**[Component Name]** - **Price:** $XXX\n" +
-    "**Reason:** Brief explanation of why this component was selected.\n\n" +
-    "### 2. Motherboard\n" +
-    "**[Component Name]** - **Price:** $XXX\n" +
-    "**Reason:** Brief explanation of why this component was selected.\n\n" +
-    "Continue this exact format for all components (RAM, Storage, Power Supply, Case).\n\n" +
-    "End with a section titled '### Total Cost Calculation' that lists each component with its price in a bullet point format:\n" +
-    "- **CPU:** $XXX\n" +
-    "- **Motherboard:** $XXX\n" +
-    "etc.\n\n" +
-    "Then provide a total cost summary and any final recommendations.\n\n" +
-    "Ensure all components are compatible with each other and stay within the user's budget. If the budget is too tight, explain what compromises might be needed.";
+    // Validate required parameters
+    if (!gpu) {
+      return new Response(JSON.stringify({ error: "GPU selection is required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
-  // Enhanced system prompt for web search
-  const webSearchSystemPrompt = systemPrompt + "\n\n" +
-    "Use web search to get the latest prices and availability of PC components when making recommendations. " +
-    "When searching for components, search for current prices from retailers like Amazon, Newegg, Best Buy, or Micro Center. " +
-    "Focus on components that are in stock and widely available. Include only the final price you found in your recommendation. " +
-    "Be specific about model numbers and include the actual prices you find from your searches.";
+    if (!budget || isNaN(budget) || budget <= 0) {
+      return new Response(JSON.stringify({ error: "Valid budget is required" }), { 
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
-  // Configuration for response stream
-  const config = {
-    model: useWebSearch ? openai.responses("gpt-4o") : openai("gpt-4o"),
-    temperature: 0.7,
-    messages: [
-      {
-        role: "system",
-        content: useWebSearch ? webSearchSystemPrompt : systemPrompt,
-      },
-      ...messages,
-    ],
-  };
+    // Define system prompt with enhanced component information
+    const systemPrompt = `You are a PC hardware expert who specializes in recommending balanced PC builds based on specific requirements.
+When generating a PC build, provide detailed component recommendations using the following consistent format:
 
-  // Add web search tools if enabled
-  if (useWebSearch) {
-    config.tools = {
-      web_search_preview: openai.tools.webSearchPreview({
-        searchContextSize: 'high'
-      }),
+### 1. CPU
+**[Component Name]** - **Price:** $XXX
+**Reason:** Brief explanation of why this component was selected.
+
+### 2. CPU Cooler (if needed)
+**[Component Name]** - **Price:** $XXX
+**Reason:** Brief explanation of why this component was selected.
+
+### 3. Motherboard
+**[Component Name]** - **Price:** $XXX
+**Reason:** Brief explanation of why this component was selected.
+
+### 4. RAM
+**[Component Name]** - **Price:** $XXX
+**Reason:** Brief explanation of why this component was selected.
+
+### 5. Storage
+**[Component Name]** - **Price:** $XXX
+**Reason:** Brief explanation of why this component was selected.
+
+### 6. Power Supply
+**[Component Name]** - **Price:** $XXX
+**Reason:** Brief explanation of why this component was selected.
+
+End with a section titled '### Total Cost Calculation' that lists each component with its price in a bullet point format:
+- **CPU:** $XXX
+- **CPU Cooler:** $XXX (if applicable)
+- **Motherboard:** $XXX
+- **RAM:** $XXX
+- **Storage:** $XXX
+- **Power Supply:** $XXX
+
+Then provide a final total cost and any additional recommendations.
+
+IMPORTANT NOTES:
+1. The user's budget of $${budget} does NOT include the GPU (${gpu.title}, $${gpu.price || 'unknown price'}) or the case ${selectedCase ? `(${selectedCase.product_name}, $${selectedCase.price || 'unknown price'})` : ''}.
+2. The budget is only for: CPU, CPU cooler (if needed), motherboard, RAM, storage, and power supply.
+3. Ensure all components are compatible with the selected GPU and each other.
+4. Prioritize performance for gaming and content creation unless specified otherwise.
+5. If the budget is tight, explain which compromises were made.`;
+
+    // Enhanced system prompt for web search
+    const webSearchSystemPrompt = systemPrompt + `
+
+When using web search:
+1. Find the latest prices from major retailers like Amazon, Newegg, Best Buy, or Micro Center.
+2. Focus on components that are currently in stock and widely available.
+3. Use specific model numbers when searching for the most accurate pricing.
+4. If multiple price points exist, use the lowest price from a reputable retailer.
+5. For CPU coolers, consider whether the CPU includes a stock cooler that may be adequate.
+6. Pay special attention to compatibility with the user's selected GPU (${gpu.title}) ${selectedCase ? `and case (${selectedCase.product_name})` : ''}.
+7. The GPU is ${gpu.length}mm long, ${gpu.height}mm tall, and ${gpu.thickness} PCIe slots thick - ensure the other components are compatible with these dimensions.`;
+
+    // Configuration for response stream
+    const config = {
+      model: useWebSearch ? openai.responses("gpt-4o") : openai("gpt-4o"),
+      temperature: 0.7,
+      messages: [
+        {
+          role: "system",
+          content: useWebSearch ? webSearchSystemPrompt : systemPrompt,
+        },
+        ...messages,
+      ],
     };
-    config.toolChoice = { type: 'tool', toolName: 'web_search_preview' };
+
+    // Add web search tools if enabled
+    if (useWebSearch) {
+      config.tools = {
+        web_search_preview: openai.tools.webSearchPreview({
+          searchContextSize: 'high',
+          numWebResults: 5  // Increased from default
+        }),
+      };
+      config.toolChoice = { type: 'tool', toolName: 'web_search_preview' };
+    }
+
+    // Create response stream
+    const result = streamText(config);
+
+    // Return a streaming response
+    return result.toDataStreamResponse();
+  } catch (error) {
+    console.error("Error in PC build generation:", error);
+    return new Response(
+      JSON.stringify({ 
+        error: "An error occurred while generating your PC build", 
+        details: error.message 
+      }),
+      { 
+        status: 500, 
+        headers: { "Content-Type": "application/json" } 
+      }
+    );
   }
-
-  // Create response stream
-  const result = streamText(config);
-
-  // Return a streaming response
-  return result.toDataStreamResponse();
 }

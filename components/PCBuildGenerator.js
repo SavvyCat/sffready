@@ -13,6 +13,7 @@ export default function PCBuildGenerator() {
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Brands");
+  const [useWebSearch, setUseWebSearch] = useState(true);
 
   // Categories from your existing code
   const categories = [
@@ -24,7 +25,7 @@ export default function PCBuildGenerator() {
   ];
 
   // Use the useChat hook for AI integration
-  const { messages, append, status } = useChat({
+  const { messages, append, status, sources } = useChat({
     api: "/api/generate-build",
     id: "pc-build-generator",
     experimental_prepareRequestBody: ({ messages }) => {
@@ -32,6 +33,7 @@ export default function PCBuildGenerator() {
         buildParams: {
           gpu: selectedGpu,
           budget: budget,
+          useWebSearch: useWebSearch,
         },
         messages: messages,
       };
@@ -151,7 +153,7 @@ export default function PCBuildGenerator() {
     }
   };
 
-  // Improved formatBuildResponse function with better markdown parsing
+  // Improved formatBuildResponse function with source information
   const formatBuildResponse = (content) => {
     if (!content) return null;
     
@@ -179,6 +181,27 @@ export default function PCBuildGenerator() {
     
     // Wrap the entire content in a div with proper structure
     processedContent = `<div class="build-content"><p>${processedContent}</p></div>`;
+    
+    // Add sources section if available
+    if (sources && sources.length > 0) {
+      const sourcesHtml = `
+        <div class="sources-section">
+          <div class="sources-title">Data Sources</div>
+          <div class="sources-list">
+            ${sources.map((source, index) => `
+              <div class="source-item">
+                <span class="source-number">${index + 1}.</span>
+                <a href="${source.url}" target="_blank" rel="noopener noreferrer" class="source-link">
+                  ${source.title || source.url.replace(/(^\w+:|^)\/\//, '').split('/')[0]}
+                </a>
+                ${source.publishedDate ? `<span class="source-date">(${source.publishedDate})</span>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      processedContent += sourcesHtml;
+    }
     
     return <div dangerouslySetInnerHTML={{ __html: processedContent }} />;
   };
@@ -228,7 +251,7 @@ export default function PCBuildGenerator() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen  p-4 sm:p-6">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
       <div className="max-w-5xl w-full mx-auto bg-zinc-900 rounded-xl shadow-2xl shadow-black/50 overflow-hidden border border-zinc-800">
         <div className="p-6 bg-gradient-to-r from-black to-zinc-900 border-b border-zinc-800">
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">
@@ -312,6 +335,43 @@ export default function PCBuildGenerator() {
               </div>
             </div>
 
+            {/* Web Search Toggle */}
+            <div className="bg-black p-4 rounded-lg shadow-inner border border-zinc-800">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-lg font-medium text-white block mb-1">
+                    Use Web Search
+                  </label>
+                  <p className="text-zinc-500 text-sm">
+                    Get real-time pricing data from online retailers
+                  </p>
+                </div>
+                <div className="relative inline-block w-12 h-6 ml-2">
+                  <input
+                    type="checkbox"
+                    id="toggle-web-search"
+                    className="sr-only"
+                    checked={useWebSearch}
+                    onChange={() => setUseWebSearch(!useWebSearch)}
+                  />
+                  <label
+                    htmlFor="toggle-web-search"
+                    className={`block overflow-hidden h-6 rounded-full cursor-pointer transition-colors duration-200 ease-in-out ${
+                      useWebSearch ? "bg-white" : "bg-zinc-700"
+                    }`}
+                  >
+                    <span
+                      className={`block h-6 w-6 rounded-full transform transition-transform duration-200 ease-in-out ${
+                        useWebSearch
+                          ? "translate-x-6 bg-black"
+                          : "translate-x-0 bg-zinc-900"
+                      }`}
+                    ></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={generateBuild}
@@ -342,7 +402,7 @@ export default function PCBuildGenerator() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Generating Build...
+                  {useWebSearch ? "Searching & Generating..." : "Generating Build..."}
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
@@ -431,7 +491,7 @@ export default function PCBuildGenerator() {
                 <div className="bg-black rounded-xl overflow-hidden shadow-lg border border-zinc-800">
                   <div className="p-4 bg-gradient-to-r from-zinc-900 to-black border-b border-zinc-800 flex items-center">
                     <h2 className="text-xl font-bold text-white">
-                      Generating Build...
+                      {useWebSearch ? "Searching & Generating..." : "Generating Build..."}
                     </h2>
                   </div>
                   <div className="p-12 flex flex-col items-center justify-center">
@@ -457,10 +517,14 @@ export default function PCBuildGenerator() {
                         ></path>
                       </svg>
                       <p className="text-zinc-400">
-                        Creating your custom PC build recommendation...
+                        {useWebSearch 
+                          ? "Searching for current prices and creating your custom build..." 
+                          : "Creating your custom PC build recommendation..."}
                       </p>
                       <p className="text-zinc-500 text-sm mt-2">
-                        This may take a few moments
+                        {useWebSearch 
+                          ? "This may take longer as we fetch real-time data" 
+                          : "This may take a few moments"}
                       </p>
                     </div>
                   </div>
@@ -496,8 +560,15 @@ export default function PCBuildGenerator() {
                   <h2 className="text-xl font-bold text-white">
                     Your Custom PC Build
                   </h2>
-                  <div className="px-3 py-1 bg-white text-black rounded-full text-sm font-medium">
-                    Budget: {formatCurrency(budget)}
+                  <div className="flex items-center gap-2">
+                    {useWebSearch && (
+                      <span className="px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded text-xs font-medium">
+                        Web Search Enabled
+                      </span>
+                    )}
+                    <div className="px-3 py-1 bg-white text-black rounded-full text-sm font-medium">
+                      Budget: {formatCurrency(budget)}
+                    </div>
                   </div>
                 </div>
                 <div className="p-6 text-white build-results">
@@ -596,6 +667,56 @@ export default function PCBuildGenerator() {
                       line-height: 1.5;
                       padding-left: 0.5rem;
                       border-left: 2px solid rgba(255, 255, 255, 0.1);
+                    }
+                    
+                    /* Source styles */
+                    .build-results .sources-section {
+                      margin-top: 2rem;
+                      padding-top: 1rem;
+                      border-top: 1px solid rgba(255, 255, 255, 0.2);
+                    }
+                    
+                    .build-results .sources-title {
+                      font-size: 1rem;
+                      font-weight: 600;
+                      color: #a1a1aa;
+                      margin-bottom: 0.75rem;
+                    }
+                    
+                    .build-results .sources-list {
+                      font-size: 0.85rem;
+                      color: #a1a1aa;
+                    }
+                    
+                    .build-results .source-item {
+                      margin-bottom: 0.5rem;
+                      display: flex;
+                      align-items: baseline;
+                    }
+                    
+                    .build-results .source-number {
+                      margin-right: 0.5rem;
+                      color: #a1a1aa;
+                      font-size: 0.8rem;
+                    }
+                    
+                    .build-results .source-link {
+                      color: #a1a1aa;
+                      text-decoration: underline;
+                      text-decoration-color: rgba(255, 255, 255, 0.2);
+                      text-underline-offset: 2px;
+                      transition: all 0.2s ease;
+                    }
+                    
+                    .build-results .source-link:hover {
+                      color: #ffffff;
+                      text-decoration-color: rgba(255, 255, 255, 0.5);
+                    }
+                    
+                    .build-results .source-date {
+                      font-size: 0.75rem;
+                      margin-left: 0.5rem;
+                      color: #71717a;
                     }
                   `}</style>
                   {formatBuildResponse(latestAiMessage.content)}

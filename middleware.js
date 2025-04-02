@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 
 // In-memory store for rate limiting
-// Note: This will reset on server restarts or when Vercel's serverless functions cold start
 let ipRequestMap = new Map();
 
 // Rate limit configuration
-const RATE_LIMIT_WINDOW = 60 * 1000 * 0.5; // 0.5 minute in milliseconds
-const MAX_REQUESTS_PER_WINDOW = 1; // Maximum 1 requests per 4 mins
+const INITIAL_COOLDOWN = 30; // 30 seconds for first tier
+const MAX_INITIAL_REQUESTS = 4; // First 4 requests use the initial cooldown
+const RESET_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
 export async function middleware(request) {
   // Skip rate limiting for non-API routes
@@ -15,7 +15,6 @@ export async function middleware(request) {
   }
 
   // Get the client's IP address
-  // Vercel automatically sets x-forwarded-for
   const ip = request.headers.get("x-forwarded-for") || "unknown";
 
   // Get current timestamp
@@ -24,62 +23,121 @@ export async function middleware(request) {
   // Initialize or get existing request data for this IP
   if (!ipRequestMap.has(ip)) {
     ipRequestMap.set(ip, {
-      count: 0,
-      windowStart: now,
+      totalRequests: 0,
+      lastRequestTime: now,
+      isLimited: false,
+      cooldownEnds: 0,
+      resetTime: now + RESET_INTERVAL, // Set initial reset time 12 hours from now
     });
   }
 
   let requestData = ipRequestMap.get(ip);
 
-  // Reset the window if it has expired
-  if (now - requestData.windowStart > RATE_LIMIT_WINDOW) {
+  // Check if it's time to reset the counter (12 hours have passed)
+  if (now >= requestData.resetTime) {
     requestData = {
-      count: 0,
-      windowStart: now,
+      totalRequests: 0,
+      lastRequestTime: now,
+      isLimited: false,
+      cooldownEnds: 0,
+      resetTime: now + RESET_INTERVAL,
     };
     ipRequestMap.set(ip, requestData);
   }
 
-  // Increment request count
-  requestData.count++;
-  ipRequestMap.set(ip, requestData);
-
-  // If rate limit exceeded, return 429 Too Many Requests
-  if (requestData.count > MAX_REQUESTS_PER_WINDOW) {
-    const timeRemaining = Math.ceil(
-      (requestData.windowStart + RATE_LIMIT_WINDOW - now) / 1000
-    );
+  // Check if user is currently in a cooldown period
+  if (requestData.isLimited && now < requestData.cooldownEnds) {
+    const timeRemaining = Math.ceil((requestData.cooldownEnds - now) / 1000);
 
     return new NextResponse(
       JSON.stringify({
         error: "Too many requests",
         message: `Rate limit exceeded. Please try again in ${timeRemaining} seconds.`,
+        resetTime: new Date(requestData.resetTime).toISOString(),
       }),
       {
         status: 429,
         headers: {
           "Content-Type": "application/json",
-          "X-RateLimit-Limit": String(MAX_REQUESTS_PER_WINDOW),
-          "X-RateLimit-Remaining": "0",
-          "X-RateLimit-Reset": String(
-            Math.ceil((requestData.windowStart + RATE_LIMIT_WINDOW) / 1000)
-          ),
           "Retry-After": String(timeRemaining),
+          "X-Rate-Limit-Reset": new Date(requestData.resetTime).toISOString(),
         },
       }
     );
   }
 
-  // Add rate limit headers to the response
+  // If cooldown has ended, reset the limited status
+  if (requestData.isLimited && now >= requestData.cooldownEnds) {
+    requestData.isLimited = false;
+  }
+
+  // Calculate cooldown period based on total requests
+  const calculateCooldown = (totalRequests) => {
+    if (totalRequests <= MAX_INITIAL_REQUESTS) {
+      return INITIAL_COOLDOWN; // 30 seconds for first 4 requests
+    } else {
+      // Exponential increase: 2^(requests-4) * 30 seconds
+      const exponent = totalRequests - MAX_INITIAL_REQUESTS;
+      return INITIAL_COOLDOWN * Math.pow(2, exponent);
+    }
+  };
+
+  // Calculate time between requests
+  const timeSinceLastRequest = now - requestData.lastRequestTime;
+  const requiredCooldown = calculateCooldown(requestData.totalRequests) * 1000; // convert to ms
+
+  if (timeSinceLastRequest < requiredCooldown) {
+    // User is trying to request too quickly - set limited status
+    requestData.isLimited = true;
+    requestData.cooldownEnds = now + (requiredCooldown - timeSinceLastRequest);
+
+    const timeRemaining = Math.ceil((requestData.cooldownEnds - now) / 1000);
+    const resetTimeRemaining = Math.ceil(
+      (requestData.resetTime - now) / 1000 / 60
+    ); // minutes
+
+    ipRequestMap.set(ip, requestData);
+
+    return new NextResponse(
+      JSON.stringify({
+        error: "Too many requests",
+        message: `Rate limit exceeded. Please try again in ${timeRemaining} seconds. Rate limits will reset in ${resetTimeRemaining} minutes.`,
+        resetTime: new Date(requestData.resetTime).toISOString(),
+      }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": String(timeRemaining),
+          "X-Rate-Limit-Reset": new Date(requestData.resetTime).toISOString(),
+        },
+      }
+    );
+  }
+
+  // Request is allowed - update tracking data
+  requestData.totalRequests += 1;
+  requestData.lastRequestTime = now;
+  ipRequestMap.set(ip, requestData);
+
+  // Add rate limit info to the response headers
   const response = NextResponse.next();
-  response.headers.set("X-RateLimit-Limit", String(MAX_REQUESTS_PER_WINDOW));
-  response.headers.set(
-    "X-RateLimit-Remaining",
-    String(MAX_REQUESTS_PER_WINDOW - requestData.count)
-  );
+  const nextCooldown = calculateCooldown(requestData.totalRequests);
+  const resetTimeRemaining = Math.ceil(
+    (requestData.resetTime - now) / 1000 / 60
+  ); // minutes
+
   response.headers.set(
     "X-RateLimit-Reset",
-    String(Math.ceil((requestData.windowStart + RATE_LIMIT_WINDOW) / 1000))
+    String(Math.ceil((now + nextCooldown * 1000) / 1000))
+  );
+  response.headers.set(
+    "X-Rate-Limit-Policy",
+    `Exponential: ${nextCooldown}s cooldown for next request. Resets in ${resetTimeRemaining} minutes.`
+  );
+  response.headers.set(
+    "X-Rate-Limit-Reset-Time",
+    new Date(requestData.resetTime).toISOString()
   );
 
   return response;

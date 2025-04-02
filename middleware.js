@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 // In-memory store for rate limiting
 let ipRequestMap = new Map();
 
-// Rate limit configuration
-const INITIAL_COOLDOWN = 30; // 30 seconds for first tier
-const MAX_INITIAL_REQUESTS = 4; // First 4 requests use the initial cooldown
-const RESET_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+// Rate limit configuration - MODIFIED VALUES
+const INITIAL_COOLDOWN = 0; // No delay between first requests (was 30 seconds)
+const MAX_INITIAL_REQUESTS = 10; // Increased from 4 to 10 for more initial requests
+const RESET_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds (was 12 hours)
 
 export async function middleware(request) {
   // Skip rate limiting for non-API routes
@@ -16,6 +16,15 @@ export async function middleware(request) {
 
   // Get the client's IP address
   const ip = request.headers.get("x-forwarded-for") || "unknown";
+
+  // For local development, you can bypass rate limiting
+  if (
+    process.env.NODE_ENV === "development" ||
+    ip === "127.0.0.1" ||
+    ip === "::1"
+  ) {
+    return NextResponse.next();
+  }
 
   // Get current timestamp
   const now = Date.now();
@@ -27,13 +36,13 @@ export async function middleware(request) {
       lastRequestTime: now,
       isLimited: false,
       cooldownEnds: 0,
-      resetTime: now + RESET_INTERVAL, // Set initial reset time 12 hours from now
+      resetTime: now + RESET_INTERVAL, // Set initial reset time 24 hours from now
     });
   }
 
   let requestData = ipRequestMap.get(ip);
 
-  // Check if it's time to reset the counter (12 hours have passed)
+  // Check if it's time to reset the counter (24 hours have passed)
   if (now >= requestData.resetTime) {
     requestData = {
       totalRequests: 0,
@@ -54,6 +63,7 @@ export async function middleware(request) {
         error: "Too many requests",
         message: `Rate limit exceeded. Please try again in ${timeRemaining} seconds.`,
         resetTime: new Date(requestData.resetTime).toISOString(),
+        waitTime: timeRemaining,
       }),
       {
         status: 429,
@@ -74,11 +84,11 @@ export async function middleware(request) {
   // Calculate cooldown period based on total requests
   const calculateCooldown = (totalRequests) => {
     if (totalRequests <= MAX_INITIAL_REQUESTS) {
-      return INITIAL_COOLDOWN; // 30 seconds for first 4 requests
+      return INITIAL_COOLDOWN; // No cooldown for first 10 requests
     } else {
-      // Exponential increase: 2^(requests-4) * 30 seconds
-      const exponent = totalRequests - MAX_INITIAL_REQUESTS;
-      return INITIAL_COOLDOWN * Math.pow(2, exponent);
+      // Gentler exponential increase: (requests-10) * 5 seconds
+      const additionalRequests = totalRequests - MAX_INITIAL_REQUESTS;
+      return Math.min(5 * additionalRequests, 120); // Cap at 2 minutes max
     }
   };
 
@@ -103,6 +113,7 @@ export async function middleware(request) {
         error: "Too many requests",
         message: `Rate limit exceeded. Please try again in ${timeRemaining} seconds. Rate limits will reset in ${resetTimeRemaining} minutes.`,
         resetTime: new Date(requestData.resetTime).toISOString(),
+        waitTime: timeRemaining,
       }),
       {
         status: 429,
@@ -133,12 +144,21 @@ export async function middleware(request) {
   );
   response.headers.set(
     "X-Rate-Limit-Policy",
-    `Exponential: ${nextCooldown}s cooldown for next request. Resets in ${resetTimeRemaining} minutes.`
+    `Linear: ${nextCooldown}s cooldown for next request. Resets in ${resetTimeRemaining} minutes.`
   );
   response.headers.set(
     "X-Rate-Limit-Reset-Time",
     new Date(requestData.resetTime).toISOString()
   );
+
+  // Clean up old entries every hour to prevent memory leaks
+  if (now % (60 * 60 * 1000) < 1000) {
+    for (const [key, value] of ipRequestMap.entries()) {
+      if (now > value.resetTime) {
+        ipRequestMap.delete(key);
+      }
+    }
+  }
 
   return response;
 }

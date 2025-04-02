@@ -35,18 +35,20 @@ const PCBuildTable = ({
 
         // Extract component name and price - improved regex to handle price formats better
         const nameMatch = section.match(
-          /\*\*([\w\s\-\d\.\(\)]+)\*\*\s+-\s+\*\*Price:\*\*\s+\$(\d+(?:\.\d+)?)/
+          /\*\*([^*]+)\*\*\s+-\s+\*\*Price:\*\*\s+\$(\d+(?:\.\d+)?)/
         );
-        
+
         // Skip components marked as "Not required" or similar
         if (!nameMatch) {
-          const noRequiredMatch = section.match(/\*\*([\w\s\-\d\.\(\)]+)\*\*\s+-\s+\*\*Price:\*\*\s+(Not required|N\/A|\$0)/i);
+          const noRequiredMatch = section.match(
+            /\*\*([^*]+)\*\*\s+-\s+\*\*Price:\*\*\s+(Not required|N\/A|\$0)/i
+          );
           if (noRequiredMatch) {
-            buildData.components.push({ 
-              type, 
-              name: noRequiredMatch[1].trim(), 
-              price: 0, 
-              reason: "Not required for this build" 
+            buildData.components.push({
+              type,
+              name: noRequiredMatch[1].trim(),
+              price: 0,
+              reason: "Not required for this build",
             });
           }
           return;
@@ -77,22 +79,22 @@ const PCBuildTable = ({
       });
 
       // Try multiple patterns to extract the total cost
-      
+
       // Pattern 1: Direct from the Total Cost section with the updated format
       const totalCostExactMatch = aiMessageContent.match(
         /\*\*Total Cost: \$(\d+(?:\.\d+)?)\*\* \(excluding GPU and case\)/
       );
-      
+
       // Pattern 2: From a Total Cost Calculation section
       const costSectionMatch = aiMessageContent.match(
         /### Total Cost Calculation[\s\S]+?Total Cost:?\s+\$(\d+(?:\.\d+)?)/i
       );
-      
+
       // Pattern 3: Just looking for Total Cost anywhere
       const totalCostMatch = aiMessageContent.match(
         /Total Cost:?\s+\$(\d+(?:\.\d+)?)/i
       );
-      
+
       // Use the first pattern that matches
       if (totalCostExactMatch) {
         buildData.totalCost = parseFloat(totalCostExactMatch[1]);
@@ -113,7 +115,7 @@ const PCBuildTable = ({
         (sum, comp) => sum + (comp.price || 0),
         0
       );
-      
+
       // If there's a significant discrepancy, log it and use the calculated value
       if (Math.abs(calculatedTotal - buildData.totalCost) > 1) {
         console.warn(
@@ -298,7 +300,7 @@ const PCBuildTable = ({
             )}
           </tfoot>
         </table>
-      </div> 
+      </div>
       {/* Actions */}
       <div className="p-4 bg-gradient-to-r from-black to-zinc-900 border-t border-zinc-800 flex justify-end gap-3">
         <button

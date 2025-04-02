@@ -86,7 +86,8 @@ IMPORTANT NOTES:
 3. Ensure all components are compatible with the selected GPU and each other.
 4. Prioritize performance for gaming and content creation unless specified otherwise.
 5. If the budget is tight, explain which compromises were made.
-6. Always verify your price addition is mathematically correct. This is critically important.`;
+6. Always verify your price addition is mathematically correct. This is critically important.
+7. ALWAYS include the power supply component in your recommendation - this is a required component.`;
 
     // Enhanced system prompt for web search
     const webSearchSystemPrompt = systemPrompt + `
@@ -99,7 +100,8 @@ When using web search:
 5. For CPU coolers, consider whether the CPU includes a stock cooler that may be adequate.
 6. Pay special attention to compatibility with the user's selected GPU (${gpu.title}) ${selectedCase ? `and case (${selectedCase.product_name})` : ''}.
 7. The GPU is ${gpu.length}mm long, ${gpu.height}mm tall, and ${gpu.thickness} PCIe slots thick - ensure the other components are compatible with these dimensions.
-8. After finding prices for all components, double-check your math when calculating the total cost.`;
+8. After finding prices for all components, double-check your math when calculating the total cost.
+9. Always include a power supply recommendation with sufficient wattage for the entire system.`;
 
     // Configuration for response stream
     const config = {

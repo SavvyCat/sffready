@@ -8,13 +8,11 @@ import { useEffect, useState } from "react";
 import BuildResponseFormatter from "./PCBuildTable";
 import SimplifiedCaseDisplay from "./SimplifiedCaseComponent";
 export default function PCBuildGenerator() {
-  const [isInitialized, setIsInitialized] = useState(false);
   const [selectedGpu, setSelectedGpu] = useState(null);
   const [budget, setBudget] = useState(1000);
   const [gpus, setGpus] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [debounceTimeout, setDebounceTimeout] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Brands");
   const [useWebSearch, setUseWebSearch] = useState(true);
   const [compatibleCases, setCompatibleCases] = useState([]);
@@ -25,8 +23,6 @@ export default function PCBuildGenerator() {
   const [caseSlug, setCaseSlug] = useState(null);
   const [caseSearchText, setCaseSearchText] = useState("");
   const [filteredCases, setFilteredCases] = useState([]);
-  const [previousGpuId, setPreviousGpuId] = useState(null);
-  const [previousCaseId, setPreviousCaseId] = useState(null);
   // Categories for GPU brands
   const categories = [
     "ASL",
@@ -155,11 +151,6 @@ export default function PCBuildGenerator() {
       }
     },
   });
-
-  // Initialize component
-  useEffect(() => {
-    setIsInitialized(true);
-  }, []);
 
   // Fetch compatible cases when GPU selection changes
   useEffect(() => {

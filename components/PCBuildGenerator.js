@@ -520,9 +520,9 @@ export default function PCBuildGenerator() {
             Ai PC Build Generator
           </h1>
           <p className="text-gray-400 mt-2">
-            Pick out your GPU and select a compatible case, set your budget for
-            the remaining components, and get a PC build recommendation with the
-            best compatible hardware.
+            Pick out a GPU and select a compatible case, set the budget for
+            the remaining components and get an Ai PC build recommendation with
+            compatible hardware.
           </p>
         </div>
 
@@ -554,7 +554,7 @@ export default function PCBuildGenerator() {
                   type="text"
                   value={searchText}
                   onChange={handleSearchChange}
-                  placeholder="e.g., RTX 3080, RX 6800 XT"
+                  placeholder="e.g., RTX 5080, RX 6800 XT"
                   className="w-full p-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-white focus:border-white"
                 />
                 {gpus.length > 0 && searchText && (
@@ -670,7 +670,7 @@ export default function PCBuildGenerator() {
               />
               <div className="flex justify-between text-sm mt-2 text-zinc-400">
                 <span>$500</span>
-                <span>$10000</span>
+                <span>$10k</span>
               </div>
             </div>
             {/* Web Search Toggle */}

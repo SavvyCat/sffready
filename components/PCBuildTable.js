@@ -33,11 +33,24 @@ const PCBuildTable = ({
 
         const type = typeMatch[1].trim();
 
-        // Extract component name and price
+        // Extract component name and price - improved regex to handle price formats better
         const nameMatch = section.match(
           /\*\*([\w\s\-\d\.\(\)]+)\*\*\s+-\s+\*\*Price:\*\*\s+\$(\d+(?:\.\d+)?)/
         );
-        if (!nameMatch) return;
+        
+        // Skip components marked as "Not required" or similar
+        if (!nameMatch) {
+          const noRequiredMatch = section.match(/\*\*([\w\s\-\d\.\(\)]+)\*\*\s+-\s+\*\*Price:\*\*\s+(Not required|N\/A|\$0)/i);
+          if (noRequiredMatch) {
+            buildData.components.push({ 
+              type, 
+              name: noRequiredMatch[1].trim(), 
+              price: 0, 
+              reason: "Not required for this build" 
+            });
+          }
+          return;
+        }
 
         const name = nameMatch[1].trim();
         const price = parseFloat(nameMatch[2]);
@@ -63,31 +76,55 @@ const PCBuildTable = ({
         buildData.components.push({ type, name, price, reason, links });
       });
 
-      // Extract total cost from cost calculation section
-      const costSectionMatch = aiMessageContent.match(
-        /### Total Cost Calculation[\s\S]+?Total Cost: \$(\d+)/
+      // Try multiple patterns to extract the total cost
+      
+      // Pattern 1: Direct from the Total Cost section with the updated format
+      const totalCostExactMatch = aiMessageContent.match(
+        /\*\*Total Cost: \$(\d+(?:\.\d+)?)\*\* \(excluding GPU and case\)/
       );
-      if (costSectionMatch) {
+      
+      // Pattern 2: From a Total Cost Calculation section
+      const costSectionMatch = aiMessageContent.match(
+        /### Total Cost Calculation[\s\S]+?Total Cost:?\s+\$(\d+(?:\.\d+)?)/i
+      );
+      
+      // Pattern 3: Just looking for Total Cost anywhere
+      const totalCostMatch = aiMessageContent.match(
+        /Total Cost:?\s+\$(\d+(?:\.\d+)?)/i
+      );
+      
+      // Use the first pattern that matches
+      if (totalCostExactMatch) {
+        buildData.totalCost = parseFloat(totalCostExactMatch[1]);
+      } else if (costSectionMatch) {
         buildData.totalCost = parseFloat(costSectionMatch[1]);
+      } else if (totalCostMatch) {
+        buildData.totalCost = parseFloat(totalCostMatch[1]);
       } else {
-        // Try another pattern
-        const totalCostMatch = aiMessageContent.match(
-          /\*\*Total Cost:\*\*\s+\$(\d+(?:\.\d+)?)/
+        // If no explicit total is found, calculate from components
+        buildData.totalCost = buildData.components.reduce(
+          (sum, comp) => sum + (comp.price || 0),
+          0
         );
-        if (totalCostMatch) {
-          buildData.totalCost = parseFloat(totalCostMatch[1]);
-        } else {
-          // If no explicit total, calculate from components
-          buildData.totalCost = buildData.components.reduce(
-            (sum, comp) => sum + (comp.price || 0),
-            0
-          );
-        }
+      }
+
+      // Verify with recalculation to ensure consistency
+      const calculatedTotal = buildData.components.reduce(
+        (sum, comp) => sum + (comp.price || 0),
+        0
+      );
+      
+      // If there's a significant discrepancy, log it and use the calculated value
+      if (Math.abs(calculatedTotal - buildData.totalCost) > 1) {
+        console.warn(
+          `Total cost discrepancy: AI reported ${buildData.totalCost}, calculated ${calculatedTotal}`
+        );
+        buildData.totalCost = calculatedTotal;
       }
 
       // Extract remaining budget
       const remainingBudgetMatch = aiMessageContent.match(
-        /Remaining Budget[:\s]+\$(\d+)/i
+        /Remaining Budget[:\s]+\$(\d+(?:\.\d+)?)/i
       );
       if (remainingBudgetMatch) {
         buildData.remainingBudget = parseFloat(remainingBudgetMatch[1]);

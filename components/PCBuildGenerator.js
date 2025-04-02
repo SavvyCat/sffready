@@ -21,7 +21,7 @@ export default function PCBuildGenerator() {
   const [recommendedCase, setRecommendedCase] = useState(null);
   const [caseLoading, setCaseLoading] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
-  const [showAllCases, setShowAllCases] = useState(false);
+  const [showAllCases, setShowAllCases] = useState(true);
   const [caseSlug, setCaseSlug] = useState(null);
   const [caseSearchText, setCaseSearchText] = useState("");
   const [filteredCases, setFilteredCases] = useState([]);
@@ -526,7 +526,7 @@ export default function PCBuildGenerator() {
                 height={50}
               />
             </span>{" "}
-            PC Build Generator
+            Ai PC Build Generator
           </h1>
           <p className="text-gray-400 mt-2">
             Select your GPU, set your budget, and get a complete PC build
@@ -933,7 +933,7 @@ export default function PCBuildGenerator() {
               )}
 
             {errorInfo.isError && (
-              <div className="bg-black rounded-xl overflow-hidden shadow-lg border border-zinc-800">
+              <div className="bg-black rounded-xl overflow-hidden shadow-lg border border-zinc-800 mt-4">
                 <div className="p-4 bg-gradient-to-r from-red-900/30 to-black border-b border-zinc-800 flex items-center">
                   <h2 className="text-xl font-bold text-white flex items-center">
                     <span className="text-red-500 mr-2">⚠️</span> Request Limit

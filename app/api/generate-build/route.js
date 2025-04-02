@@ -1,146 +1,149 @@
-import { openai } from "@ai-sdk/openai";
-import { streamText } from "ai";
+import { NextResponse } from "next/server";
 
-// Allow streaming responses up to 60 seconds (increased from 30)
-export const maxDuration = 60;
+// In-memory store for rate limiting
+let ipRequestMap = new Map();
 
-export async function POST(req) {
-  try {
-    // Get JSON body from the request
-    const body = await req.json();
+// Rate limit configuration
+const INITIAL_COOLDOWN = 30; // 30 seconds for first tier
+const MAX_INITIAL_REQUESTS = 4; // First 4 requests use the initial cooldown
+const RESET_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
-    // Extract messages and build parameters with better error handling
-    const { messages = [], buildParams = {} } = body;
-    const { gpu, budget, useWebSearch = true, selectedCase } = buildParams;
+export async function middleware(request) {
+  // Skip rate limiting for non-API routes
+  if (!request.nextUrl.pathname.startsWith("/api/generate-build")) {
+    return NextResponse.next();
+  }
 
-    // Validate required parameters
-    if (!gpu) {
-      return new Response(JSON.stringify({ error: "GPU selection is required" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
+  // Get the client's IP address
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
 
-    if (!budget || isNaN(budget) || budget <= 0) {
-      return new Response(JSON.stringify({ error: "Valid budget is required" }), { 
-        status: 400,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
+  // Get current timestamp
+  const now = Date.now();
 
-    // Define system prompt with enhanced component information and explicit calculation instructions
-    const systemPrompt = `You are a PC hardware expert who specializes in recommending balanced PC builds based on specific requirements.
-When generating a PC build, provide detailed component recommendations using the following consistent format:
+  // Initialize or get existing request data for this IP
+  if (!ipRequestMap.has(ip)) {
+    ipRequestMap.set(ip, {
+      totalRequests: 0,
+      lastRequestTime: now,
+      isLimited: false,
+      cooldownEnds: 0,
+      resetTime: now + RESET_INTERVAL, // Set initial reset time 12 hours from now
+    });
+  }
 
-### 1. CPU
-**[Component Name]** - **Price:** $XXX
-**Reason:** Brief explanation of why this component was selected.
+  let requestData = ipRequestMap.get(ip);
 
-### 2. CPU Cooler (if needed)
-**[Component Name]** - **Price:** $XXX
-**Reason:** Brief explanation of why this component was selected.
-
-### 3. Motherboard
-**[Component Name]** - **Price:** $XXX
-**Reason:** Brief explanation of why this component was selected.
-
-### 4. RAM
-**[Component Name]** - **Price:** $XXX
-**Reason:** Brief explanation of why this component was selected.
-
-### 5. Storage
-**[Component Name]** - **Price:** $XXX
-**Reason:** Brief explanation of why this component was selected.
-
-### 6. Power Supply
-**[Component Name]** - **Price:** $XXX
-**Reason:** Brief explanation of why this component was selected.
-
-End with a section titled '### Total Cost Calculation' that lists each component with its price in a bullet point format:
-- **CPU:** $XXX
-- **CPU Cooler:** $XXX (if applicable, if not needed write "Not required" or "$0")
-- **Motherboard:** $XXX
-- **RAM:** $XXX
-- **Storage:** $XXX
-- **Power Supply:** $XXX
-
-IMPORTANT: You must carefully add up all component prices to ensure mathematical accuracy. 
-Calculate the final total by adding ONLY these prices - do NOT include the GPU or case price in this total.
-Double-check your math before providing the final total.
-
-For example, if the components are:
-- CPU: $300
-- CPU Cooler: $50
-- Motherboard: $150
-- RAM: $100
-- Storage: $120
-- Power Supply: $80
-
-The total should be $300 + $50 + $150 + $100 + $120 + $80 = $800.
-
-Then write: "**Total Cost: $800** (excluding GPU and case)"
-
-IMPORTANT NOTES:
-1. The user's budget of $${budget} does NOT include the GPU (${gpu.title}, $${gpu.price || 'unknown price'}) or the case ${selectedCase ? `(${selectedCase.product_name}, $${selectedCase.price || 'unknown price'})` : ''}.
-2. The budget is only for: CPU, CPU cooler (if needed), motherboard, RAM, storage, and power supply.
-3. Ensure all components are compatible with the selected GPU and each other.
-4. Prioritize performance for gaming and content creation unless specified otherwise.
-5. If the budget is tight, explain which compromises were made.
-6. Always verify your price addition is mathematically correct. This is critically important.`;
-
-    // Enhanced system prompt for web search
-    const webSearchSystemPrompt = systemPrompt + `
-
-When using web search:
-1. Find the latest prices from major retailers like Amazon, Newegg, Best Buy, or Micro Center.
-2. Focus on components that are currently in stock and widely available.
-3. Use specific model numbers when searching for the most accurate pricing.
-4. If multiple price points exist, use the lowest price from a reputable retailer.
-5. For CPU coolers, consider whether the CPU includes a stock cooler that may be adequate.
-6. Pay special attention to compatibility with the user's selected GPU (${gpu.title}) ${selectedCase ? `and case (${selectedCase.product_name})` : ''}.
-7. The GPU is ${gpu.length}mm long, ${gpu.height}mm tall, and ${gpu.thickness} PCIe slots thick - ensure the other components are compatible with these dimensions.
-8. After finding prices for all components, double-check your math when calculating the total cost.`;
-
-    // Configuration for response stream
-    const config = {
-      model: useWebSearch ? openai.responses("gpt-4o") : openai("gpt-4o"),
-      temperature: 0.7,
-      messages: [
-        {
-          role: "system",
-          content: useWebSearch ? webSearchSystemPrompt : systemPrompt,
-        },
-        ...messages,
-      ],
+  // Check if it's time to reset the counter (12 hours have passed)
+  if (now >= requestData.resetTime) {
+    requestData = {
+      totalRequests: 0,
+      lastRequestTime: now,
+      isLimited: false,
+      cooldownEnds: 0,
+      resetTime: now + RESET_INTERVAL,
     };
+    ipRequestMap.set(ip, requestData);
+  }
 
-    // Add web search tools if enabled
-    if (useWebSearch) {
-      config.tools = {
-        web_search_preview: openai.tools.webSearchPreview({
-          searchContextSize: 'medium',
-          numWebResults: 3  // Increased from default
-        }),
-      };
-      config.toolChoice = { type: 'tool', toolName: 'web_search_preview' };
-    }
+  // Check if user is currently in a cooldown period
+  if (requestData.isLimited && now < requestData.cooldownEnds) {
+    const timeRemaining = Math.ceil((requestData.cooldownEnds - now) / 1000);
 
-    // Create response stream
-    const result = streamText(config);
-
-    // Return a streaming response
-    return result.toDataStreamResponse();
-  } catch (error) {
-    console.error("Error in PC build generation:", error);
-    return new Response(
-      JSON.stringify({ 
-        error: "An error occurred while generating your PC build", 
-        details: error.message 
+    return new NextResponse(
+      JSON.stringify({
+        error: "Too many requests",
+        message: `Rate limit exceeded. Please try again in ${timeRemaining} seconds.`,
+        resetTime: new Date(requestData.resetTime).toISOString(),
       }),
-      { 
-        status: 500, 
-        headers: { "Content-Type": "application/json" } 
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": String(timeRemaining),
+          "X-Rate-Limit-Reset": new Date(requestData.resetTime).toISOString(),
+        },
       }
     );
   }
+
+  // If cooldown has ended, reset the limited status
+  if (requestData.isLimited && now >= requestData.cooldownEnds) {
+    requestData.isLimited = false;
+  }
+
+  // Calculate cooldown period based on total requests
+  const calculateCooldown = (totalRequests) => {
+    if (totalRequests <= MAX_INITIAL_REQUESTS) {
+      return INITIAL_COOLDOWN; // 30 seconds for first 4 requests
+    } else {
+      // Exponential increase: 2^(requests-4) * 30 seconds
+      const exponent = totalRequests - MAX_INITIAL_REQUESTS;
+      return INITIAL_COOLDOWN * Math.pow(2, exponent);
+    }
+  };
+
+  // Calculate time between requests
+  const timeSinceLastRequest = now - requestData.lastRequestTime;
+  const requiredCooldown = calculateCooldown(requestData.totalRequests) * 1000; // convert to ms
+
+  if (timeSinceLastRequest < requiredCooldown) {
+    // User is trying to request too quickly - set limited status
+    requestData.isLimited = true;
+    requestData.cooldownEnds = now + (requiredCooldown - timeSinceLastRequest);
+
+    const timeRemaining = Math.ceil((requestData.cooldownEnds - now) / 1000);
+    const resetTimeRemaining = Math.ceil(
+      (requestData.resetTime - now) / 1000 / 60
+    ); // minutes
+
+    ipRequestMap.set(ip, requestData);
+
+    return new NextResponse(
+      JSON.stringify({
+        error: "Too many requests",
+        message: `Rate limit exceeded. Please try again in ${timeRemaining} seconds. Rate limits will reset in ${resetTimeRemaining} minutes.`,
+        resetTime: new Date(requestData.resetTime).toISOString(),
+      }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": String(timeRemaining),
+          "X-Rate-Limit-Reset": new Date(requestData.resetTime).toISOString(),
+        },
+      }
+    );
+  }
+
+  // Request is allowed - update tracking data
+  requestData.totalRequests += 1;
+  requestData.lastRequestTime = now;
+  ipRequestMap.set(ip, requestData);
+
+  // Add rate limit info to the response headers
+  const response = NextResponse.next();
+  const nextCooldown = calculateCooldown(requestData.totalRequests);
+  const resetTimeRemaining = Math.ceil(
+    (requestData.resetTime - now) / 1000 / 60
+  ); // minutes
+
+  response.headers.set(
+    "X-RateLimit-Reset",
+    String(Math.ceil((now + nextCooldown * 1000) / 1000))
+  );
+  response.headers.set(
+    "X-Rate-Limit-Policy",
+    `Exponential: ${nextCooldown}s cooldown for next request. Resets in ${resetTimeRemaining} minutes.`
+  );
+  response.headers.set(
+    "X-Rate-Limit-Reset-Time",
+    new Date(requestData.resetTime).toISOString()
+  );
+
+  return response;
 }
+
+// Configure middleware to run only for specific paths
+export const config = {
+  matcher: ["/api/generate-build"],
+};

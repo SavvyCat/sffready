@@ -14,7 +14,7 @@ export default function PCBuildGenerator() {
   const [searchText, setSearchText] = useState("");
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("All Brands");
-  const [useWebSearch, setUseWebSearch] = useState(true);
+  const [useWebSearch, setUseWebSearch] = useState(false);
   const [compatibleCases, setCompatibleCases] = useState([]);
   const [recommendedCase, setRecommendedCase] = useState(null);
   const [caseLoading, setCaseLoading] = useState(false);
@@ -520,8 +520,9 @@ export default function PCBuildGenerator() {
             Ai PC Build Generator
           </h1>
           <p className="text-gray-400 mt-2">
-            Select your GPU, set your budget, and get a complete PC build
-            recommendation with an optimal compatible case
+            Pick out your GPU and select a compatible case, set your budget for
+            the remaining components, and get a PC build recommendation with the
+            best compatible hardware.
           </p>
         </div>
 

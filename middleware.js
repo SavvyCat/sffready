@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 let ipRequestMap = new Map();
 
 // Rate limit configuration
-const RATE_LIMIT_WINDOW = 60 * 1000 * 4; // 4 minute in milliseconds
+const RATE_LIMIT_WINDOW = 60 * 1000 * 0.5; // 0.5 minute in milliseconds
 const MAX_REQUESTS_PER_WINDOW = 1; // Maximum 1 requests per 4 mins
 
 export async function middleware(request) {

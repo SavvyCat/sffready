@@ -669,7 +669,7 @@ export default function PCBuildGenerator() {
               />
               <div className="flex justify-between text-sm mt-2 text-zinc-400">
                 <span>$500</span>
-                <span>$3000</span>
+                <span>$10000</span>
               </div>
             </div>
             {/* Web Search Toggle */}

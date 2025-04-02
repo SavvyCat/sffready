@@ -5,7 +5,8 @@ import supabase from "@/Backend/supabase";
 import { useChat } from "@ai-sdk/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
+import BuildResponseFormatter from "./PCBuildTable";
+import SimplifiedCaseDisplay from "./SimplifiedCaseComponent";
 export default function PCBuildGenerator() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedGpu, setSelectedGpu] = useState(null);
@@ -21,7 +22,11 @@ export default function PCBuildGenerator() {
   const [caseLoading, setCaseLoading] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
   const [showAllCases, setShowAllCases] = useState(false);
-  const [fetchStatus, setFetchStatus] = useState("idle");
+  const [caseSlug, setCaseSlug] = useState(null);
+  const [caseSearchText, setCaseSearchText] = useState("");
+  const [filteredCases, setFilteredCases] = useState([]);
+  const [previousGpuId, setPreviousGpuId] = useState(null);
+  const [previousCaseId, setPreviousCaseId] = useState(null);
   // Categories for GPU brands
   const categories = [
     "ASL",
@@ -64,26 +69,46 @@ export default function PCBuildGenerator() {
     message: "",
   });
 
+  useEffect(() => {
+    const activeCase = selectedCase || recommendedCase;
+
+    if (activeCase && activeCase.url) {
+      setCaseSlug(extractCaseSlugFromUrl(activeCase.url));
+    } else {
+      setCaseSlug(null);
+    }
+  }, [selectedCase, recommendedCase]);
+
+  const extractCaseSlugFromUrl = (url) => {
+    if (!url) return null;
+
+    // The URL format appears to be something like "...abee/case-slug"
+    const match = url.match(/abee\/([^\/]+)/);
+    return match ? match[1] : null;
+  };
+
   const handleRateLimitError = (error) => {
     console.log("Error received:", error);
 
     try {
       // Try to parse the error message
-      let errorData = typeof error.message === 'string' 
-        ? JSON.parse(error.message) 
-        : error.message;
+      let errorData =
+        typeof error.message === "string"
+          ? JSON.parse(error.message)
+          : error.message;
 
       // Extract error message and wait time
       const errorMessage = errorData.message || "Rate limit exceeded";
-      const waitTime = errorData.waitTime || 
-        (errorData.message && errorData.message.match(/(\d+)/)?.[1]) || 
+      const waitTime =
+        errorData.waitTime ||
+        (errorData.message && errorData.message.match(/(\d+)/)?.[1]) ||
         818; // default to 818 if no time found
 
       // Set error state with more detailed information
       setErrorInfo({
         isError: true,
         message: `${errorMessage}.`,
-        displayTime: waitTime
+        displayTime: waitTime,
       });
     } catch (e) {
       console.error("Error parsing rate limit message:", e);
@@ -95,7 +120,7 @@ export default function PCBuildGenerator() {
   };
   // Simplify the Try Again handler
   const handleTryAgain = (e) => {
-    setErrorInfo({isError: false,})
+    setErrorInfo({ isError: false });
     generateBuild(e);
   };
 
@@ -128,10 +153,6 @@ export default function PCBuildGenerator() {
           message: "",
         });
       }
-      setFetchStatus("success");
-    },
-    onFinish: () => {
-      setFetchStatus("success");
     },
   });
 
@@ -158,6 +179,7 @@ export default function PCBuildGenerator() {
             selectedGpu.thickness
           );
           setCompatibleCases(cases);
+          setFilteredCases(cases); // Set filtered cases to all compatible cases initially
 
           // Find the most optimal case (smallest volume with good airflow)
           if (cases.length > 0) {
@@ -185,6 +207,7 @@ export default function PCBuildGenerator() {
         }
       } else {
         setCompatibleCases([]);
+        setFilteredCases([]);
         setRecommendedCase(null);
         setSelectedCase(null);
       }
@@ -413,18 +436,28 @@ export default function PCBuildGenerator() {
   // Get active case (either selected or recommended)
   const activeCase = selectedCase || recommendedCase;
 
+  const handleCaseSearchChange = (e) => {
+    const value = e.target.value.toLowerCase();
+    setCaseSearchText(value);
+
+    if (value.trim() === "") {
+      setFilteredCases(compatibleCases);
+    } else {
+      const filtered = compatibleCases.filter((caseItem) =>
+        caseItem.product_name.toLowerCase().includes(value)
+      );
+      setFilteredCases(filtered);
+    }
+  };
+
   // Generate a PC build based on selected GPU and budget
   const generateBuild = (e) => {
     e.preventDefault();
-
-    
 
     if (!selectedGpu) {
       alert("Please select a GPU first");
       return;
     }
-
-    setFetchStatus("loading");
 
     // Create a more detailed prompt with clear budget instructions
     let prompt = `Generate a PC build with a budget of $${budget}. This budget is for CPU, motherboard, RAM, storage, power supply, and CPU cooler only.`;
@@ -479,7 +512,7 @@ export default function PCBuildGenerator() {
       handleRateLimitError(error);
     });
   };
-  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
       <div className="max-w-6xl w-full mx-auto bg-zinc-900 rounded-xl shadow-2xl shadow-black/50 overflow-hidden border border-zinc-800">
@@ -520,7 +553,6 @@ export default function PCBuildGenerator() {
                 ))}
               </select>
             </div>
-
             <div className="bg-black p-4 rounded-lg shadow-inner border border-zinc-800">
               <label className="block mb-3 text-lg font-medium text-white">
                 Search GPU Model
@@ -548,7 +580,84 @@ export default function PCBuildGenerator() {
                 )}
               </div>
             </div>
+            {/* Case compatibility info */}
+            {selectedGpu && (
+              <div className="bg-black p-4 rounded-lg shadow-inner border border-zinc-800">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-medium text-white">
+                    Compatible Cases
+                  </h3>
+                  {compatibleCases.length > 1 && (
+                    <button
+                      onClick={() => setShowAllCases(!showAllCases)}
+                      className="text-xs px-2 py-1 bg-zinc-800 text-zinc-300 rounded hover:bg-zinc-700 transition"
+                    >
+                      {showAllCases ? "Hide" : "Show All"}
+                    </button>
+                  )}
+                </div>
+                {caseLoading ? (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+                  </div>
+                ) : compatibleCases.length > 0 ? (
+                  <div className="text-zinc-400">
+                    <p className="mb-2">
+                      Found {compatibleCases.length} compatible cases
+                    </p>
 
+                    {/* Case search input */}
+                    <div className="mb-2">
+                      <input
+                        type="text"
+                        value={caseSearchText}
+                        onChange={handleCaseSearchChange}
+                        placeholder="Search cases..."
+                        className="w-full p-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-white focus:border-white text-sm"
+                      />
+                    </div>
+
+                    {!showAllCases ? (
+                      activeCase && (
+                        <div className="text-white bg-zinc-800 p-2 rounded mb-2">
+                          <div className="font-medium">
+                            {activeCase.product_name}
+                          </div>
+                        </div>
+                      )
+                    ) : (
+                      <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
+                        {filteredCases.map((caseItem, index) => (
+                          <div
+                            key={index}
+                            className={`text-white bg-zinc-800 p-2 rounded cursor-pointer hover:bg-zinc-700 transition ${
+                              (selectedCase &&
+                                selectedCase.image_id === caseItem.image_id) ||
+                              (!selectedCase &&
+                                recommendedCase &&
+                                recommendedCase.image_id === caseItem.image_id)
+                                ? "border border-white"
+                                : ""
+                            }`}
+                            onClick={() => handleCaseSelection(caseItem)}
+                          >
+                            <div className="font-medium">
+                              {caseItem.product_name}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-zinc-400">
+                    No compatible cases found for this GPU
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Case Section */}
             <div className="bg-black p-4 rounded-lg shadow-inner border border-zinc-800">
               <div className="flex justify-between items-center mb-3">
                 <label className="text-lg font-medium text-white">
@@ -561,7 +670,7 @@ export default function PCBuildGenerator() {
               <input
                 type="range"
                 min="500"
-                max="3000"
+                max="10000"
                 step="50"
                 value={budget}
                 onChange={(e) => setBudget(Number(e.target.value))}
@@ -572,7 +681,6 @@ export default function PCBuildGenerator() {
                 <span>$3000</span>
               </div>
             </div>
-
             {/* Web Search Toggle */}
             <div className="bg-black p-4 rounded-lg shadow-inner border border-zinc-800">
               <div className="flex items-center justify-between">
@@ -609,86 +717,6 @@ export default function PCBuildGenerator() {
                 </div>
               </div>
             </div>
-
-            {/* Case compatibility info */}
-            {selectedGpu && (
-              <div className="bg-black p-4 rounded-lg shadow-inner border border-zinc-800">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-medium text-white">
-                    Compatible Cases
-                  </h3>
-                  {compatibleCases.length > 1 && (
-                    <button
-                      onClick={() => setShowAllCases(!showAllCases)}
-                      className="text-xs px-2 py-1 bg-zinc-800 text-zinc-300 rounded hover:bg-zinc-700 transition"
-                    >
-                      {showAllCases ? "Hide" : "Show All"}
-                    </button>
-                  )}
-                </div>
-                {caseLoading ? (
-                  <div className="flex justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
-                  </div>
-                ) : compatibleCases.length > 0 ? (
-                  <div className="text-zinc-400">
-                    <p className="mb-2">
-                      Found {compatibleCases.length} compatible cases
-                    </p>
-                    {!showAllCases ? (
-                      activeCase && (
-                        <div className="text-white bg-zinc-800 p-2 rounded mb-2">
-                          <div className="font-medium">
-                            {activeCase.product_name}
-                          </div>
-                          <div className="text-xs text-zinc-400">
-                            {activeCase.volume
-                              ? `${activeCase.volume}L`
-                              : `${activeCase.width || 0} × ${
-                                  activeCase.height || 0
-                                } × ${activeCase.depth || 0}mm`}
-                          </div>
-                        </div>
-                      )
-                    ) : (
-                      <div className="max-h-40 overflow-y-auto space-y-2 pr-2">
-                        {compatibleCases.map((caseItem, index) => (
-                          <div
-                            key={index}
-                            className={`text-white bg-zinc-800 p-2 rounded cursor-pointer hover:bg-zinc-700 transition ${
-                              (selectedCase &&
-                                selectedCase.image_id === caseItem.image_id) ||
-                              (!selectedCase &&
-                                recommendedCase &&
-                                recommendedCase.image_id === caseItem.image_id)
-                                ? "border border-white"
-                                : ""
-                            }`}
-                            onClick={() => handleCaseSelection(caseItem)}
-                          >
-                            <div className="font-medium">
-                              {caseItem.product_name}
-                            </div>
-                            <div className="text-xs text-zinc-400">
-                              {caseItem.volume
-                                ? `${caseItem.volume}L`
-                                : `${caseItem.width || 0} × ${
-                                    caseItem.height || 0
-                                  } × ${caseItem.depth || 0}mm`}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-zinc-400">
-                    No compatible cases found for this GPU
-                  </p>
-                )}
-              </div>
-            )}
-
             <button
               type="button"
               onClick={generateBuild}
@@ -746,13 +774,13 @@ export default function PCBuildGenerator() {
                     </h2>
                   </div>
                   <div className="p-4">
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-center mb-4 bg-white">
                       {getGpuImage() ? (
-                        <div className="w-48 h-48 relative bg-transparent rounded-lg overflow-hidden">
+                        <div className="w-48 h-48 relative bg-transparent rounded-lg overflow-hidden ">
                           <img
                             src={getGpuImage()}
                             alt={selectedGpu.title}
-                            className="absolute inset-0 w-full h-full object-contain"
+                            className="absolute inset-0 w-full h-full object-contain "
                           />
                         </div>
                       ) : (
@@ -811,7 +839,7 @@ export default function PCBuildGenerator() {
                     </h2>
                   </div>
                   <div className="p-4">
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-center mb-4 bg-white">
                       {getCaseImage(activeCase) ? (
                         <div className="w-48 h-48 relative bg-transparent rounded-lg overflow-hidden">
                           <img
@@ -831,31 +859,6 @@ export default function PCBuildGenerator() {
                     <h3 className="text-center text-white font-medium mb-2">
                       {activeCase.product_name}
                     </h3>
-                    {activeCase.price && (
-                      <p className="text-center text-gray-300 text-sm mb-2">
-                        {formatCurrency(activeCase.price)}
-                      </p>
-                    )}
-                    <div className="grid grid-cols-3 gap-2 text-center text-xs text-zinc-400">
-                      <div className="bg-zinc-800 rounded p-1">
-                        <span className="block text-zinc-500">Length</span>
-                        <span className="text-white">
-                          {activeCase.length} mm
-                        </span>
-                      </div>
-                      <div className="bg-zinc-800 rounded p-1">
-                        <span className="block text-zinc-500">Height</span>
-                        <span className="text-white">
-                          {activeCase.height} mm
-                        </span>
-                      </div>
-                      <div className="bg-zinc-800 rounded p-1">
-                        <span className="block text-zinc-500">Volume</span>
-                        <span className="text-white">
-                          {activeCase.volume || "N/A"} L
-                        </span>
-                      </div>
-                    </div>
                   </div>
                 </div>
               ) : (
@@ -878,7 +881,9 @@ export default function PCBuildGenerator() {
                 )
               )}
             </div>
-
+            {activeCase && caseSlug && (
+              <SimplifiedCaseDisplay caseSlug={caseSlug} />
+            )}
             {/* Build Results or Status Indication */}
             {(chatStatus === "streaming" || chatStatus === "submitted") &&
               !latestAiMessage && (
@@ -950,97 +955,16 @@ export default function PCBuildGenerator() {
                 </div>
               </div>
             )}
-
             {latestAiMessage && (
-              <div className="bg-black rounded-xl overflow-hidden shadow-lg border border-zinc-800">
-                <div className="p-4 bg-gradient-to-r from-zinc-900 to-black border-b border-zinc-800 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-white">
-                    Your Custom PC Build
-                  </h2>
-                  <div className="flex items-center gap-2">
-                    {useWebSearch && (
-                      <span className="px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded text-xs font-medium">
-                        Web Search Enabled
-                      </span>
-                    )}
-                    <div className="px-3 py-1 bg-white text-black rounded-full text-sm font-medium">
-                      Budget: {formatCurrency(budget)}
-                    </div>
-                  </div>
-                </div>
-                <div className="p-6 text-white build-results">
-                  {/* Your existing style jsx global section remains unchanged */}
-                  {formatBuildResponse(latestAiMessage.content)}
-                </div>
-
-                {/* Share Build Button */}
-                <div className="px-6 pb-6 flex justify-end">
-                  <button
-                    onClick={() => {
-                      // Create shareable content
-                      const gpuInfo = selectedGpu
-                        ? `GPU: ${selectedGpu.title}`
-                        : "";
-                      const caseInfo = activeCase
-                        ? `\nCase: ${activeCase.product_name}`
-                        : "";
-                      const buildInfo = latestAiMessage
-                        ? `\n\nBuild details:\n${latestAiMessage.content}`
-                        : "";
-                      const content = `My Custom PC Build ${gpuInfo}${caseInfo}${buildInfo}`;
-
-                      // Try to use the clipboard API
-                      if (navigator.clipboard) {
-                        navigator.clipboard
-                          .writeText(content)
-                          .then(() => alert("Build copied to clipboard!"))
-                          .catch((err) =>
-                            console.error("Could not copy text: ", err)
-                          );
-                      } else {
-                        // Fallback
-                        const textArea = document.createElement("textarea");
-                        textArea.value = content;
-                        document.body.appendChild(textArea);
-                        textArea.focus();
-                        textArea.select();
-
-                        try {
-                          document.execCommand("copy");
-                          alert("Build copied to clipboard!");
-                        } catch (err) {
-                          console.error("Could not copy text: ", err);
-                        }
-
-                        document.body.removeChild(textArea);
-                      }
-                    }}
-                    className="px-4 py-2 bg-zinc-800 text-zinc-300 rounded hover:bg-zinc-700 transition flex items-center gap-2"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect
-                        x="9"
-                        y="9"
-                        width="13"
-                        height="13"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                    </svg>
-                    Copy Build
-                  </button>
-                </div>
+              <div className="bg-black rounded-xl overflow-hidden shadow-lg border border-zinc-800 mt-5">
+                {/* The BuildResponseFormatter handles everything */}
+                <BuildResponseFormatter
+                  content={latestAiMessage.content}
+                  selectedGpu={selectedGpu}
+                  activeCase={activeCase || recommendedCase}
+                  budget={budget}
+                  useWebSearch={useWebSearch}
+                />
               </div>
             )}
           </div>

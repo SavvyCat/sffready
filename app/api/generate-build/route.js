@@ -118,7 +118,7 @@ When using web search:
     if (useWebSearch) {
       config.tools = {
         web_search_preview: openai.tools.webSearchPreview({
-          searchContextSize: 'high',
+          searchContextSize: 'medium',
           numWebResults: 3  // Increased from default
         }),
       };

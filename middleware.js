@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 let ipRequestMap = new Map();
 
 // Rate limit configuration - MODIFIED VALUES
-const INITIAL_COOLDOWN = 0; // No delay between first requests (was 30 seconds)
-const MAX_INITIAL_REQUESTS = 10; // Increased from 4 to 10 for more initial requests
+const INITIAL_COOLDOWN = 0; // No delay between first requests
+const MAX_INITIAL_REQUESTS = 4;
 const RESET_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds (was 12 hours)
 
 export async function middleware(request) {
@@ -16,15 +16,6 @@ export async function middleware(request) {
 
   // Get the client's IP address
   const ip = request.headers.get("x-forwarded-for") || "unknown";
-
-  // For local development, you can bypass rate limiting
-  if (
-    process.env.NODE_ENV === "development" ||
-    ip === "127.0.0.1" ||
-    ip === "::1"
-  ) {
-    return NextResponse.next();
-  }
 
   // Get current timestamp
   const now = Date.now();
@@ -83,12 +74,12 @@ export async function middleware(request) {
 
   // Calculate cooldown period based on total requests
   const calculateCooldown = (totalRequests) => {
-    if (totalRequests <= MAX_INITIAL_REQUESTS) {
-      return INITIAL_COOLDOWN; // No cooldown for first 10 requests
+    if (totalRequests < MAX_INITIAL_REQUESTS) {
+      return INITIAL_COOLDOWN; // No cooldown for first requests
     } else {
       // Gentler exponential increase: (requests-10) * 5 seconds
-      const additionalRequests = totalRequests - MAX_INITIAL_REQUESTS;
-      return Math.min(5 * additionalRequests, 120); // Cap at 2 minutes max
+      const additionalRequests = (totalRequests + 1 - MAX_INITIAL_REQUESTS) * 4;
+      return Math.min(5 * additionalRequests, 250); // Cap at 2 minutes max
     }
   };
 

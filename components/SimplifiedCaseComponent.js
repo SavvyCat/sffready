@@ -74,9 +74,9 @@ const SimplifiedCaseDisplay = ({ caseSlug }) => {
                 Size
               </th>
               <th scope="row"></th>
-              <th scope="col">Short(MM)</th>
-              <th scope="col">Medium(MM)</th>
-              <th scope="col">Long(MM)</th>
+              <th scope="col">Width(MM)</th>
+              <th scope="col">Height(MM)</th>
+              <th scope="col">Length(MM)</th>
               <th scope="col">Volume(L)</th>
             </tr>
             <tr>
@@ -85,44 +85,6 @@ const SimplifiedCaseDisplay = ({ caseSlug }) => {
               <td>{modeInfo.depth}</td>
               <td>{modeInfo.height}</td>
               <td>{modeInfo.volume}</td>
-            </tr>
-            <tr>
-              <th scope="row">Package</th>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-            </tr>
-            <tr>
-              <th scope="row" rowSpan={6}>
-                GPU
-              </th>
-              <th scope="col">PCI-E Riser</th>
-              <th scope="col">Width (MM)</th>
-              <th scope="col">Height (MM)</th>
-              <th scope="col">Length (MM)</th>
-              <th scope="col"></th>
-            </tr>
-            <tr>
-              <td>{modeInfo.pcie_riser ? "Yes" : "No"}</td>
-              <td>{modeInfo.gpu_width}</td>
-              <td>{modeInfo.gpu_height}</td>
-              <td>{modeInfo.gpu_length}</td>
-              <td></td>
-            </tr>
-            <tr>
-              <th scope="col">Full</th>
-              <th scope="col">Low</th>
-              <th scope="col">Extra Full</th>
-              <th scope="col">Extra Low</th>
-              <th scope="col"></th>
-            </tr>
-            <tr>
-              <td>{modeInfo.slot}</td>
-              <td>{modeInfo.low_profile_slot || "-"}</td>
-              <td>{modeInfo.extra_slot || "-"}</td>
-              <td>{modeInfo.extra_low_profile_slot || "-"}</td>
-              <td></td>
             </tr>
           </tbody>
         </table>

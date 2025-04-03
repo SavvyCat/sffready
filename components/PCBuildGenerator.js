@@ -520,9 +520,8 @@ export default function PCBuildGenerator() {
             Ai PC Build Generator
           </h1>
           <p className="text-gray-400 mt-2">
-            Pick out a GPU and select a compatible case, 
-            set the budget for the remaining components 
-            and get an Ai PC build recommendation with compatible hardware.
+            Choose a GPU, pick a compatible case, set a budget for the rest, 
+            and get an AI-powered PC build recommendation with compatible parts.
           </p>
         </div>
 

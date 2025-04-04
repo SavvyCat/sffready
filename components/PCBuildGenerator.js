@@ -428,6 +428,7 @@ export default function PCBuildGenerator() {
   const activeCase = selectedCase || recommendedCase;
 
   const handleCaseSearchChange = (e) => {
+    setShowAllCases(true);
     const value = e.target.value.toLowerCase();
     setCaseSearchText(value);
 

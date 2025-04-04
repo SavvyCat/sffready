@@ -1,4 +1,5 @@
 const CaseEndComponent = ({ data, id }) => {
+  console.log(data.modes.results[0]);
   return (
     <>
       <main className="sm:px-2">
@@ -43,39 +44,21 @@ const CaseEndComponent = ({ data, id }) => {
                       </td>
                     </tr>
                     <tr>
-                      <th scope="row" rowSpan={3}>
+                      <th scope="row" rowSpan={2}>
                         Size
                       </th>
-                      <th scope="row">\\</th>
-                      <th scope="col">Short(MM)</th>
-                      <th scope="col">Medium(MM)</th>
-                      <th scope="col">Long(MM)</th>
+                      <th scope="row"></th>
+                      <th scope="col">Width(MM)</th>
+                      <th scope="col">Height(MM)</th>
+                      <th scope="col">Length(MM)</th>
                       <th scope="col">Volume(L)</th>
                     </tr>
                     <tr>
                       <th scope="row">Body</th>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
+                      <td>{data.modes.results[0].width}</td>
+                      <td>{data.modes.results[0].depth}</td>
+                      <td>{data.modes.results[0].height}</td>
                       <td>{data.modes.results[0].volume}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Package</th>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                    </tr>
-                    <tr>
-                      <th scope="row" rowSpan={2}>
-                        Weight(KG)
-                      </th>
-                      <th scope="row">Body</th>
-                      <td colSpan={4}>-</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">Package</th>
-                      <td colSpan={4}>-</td>
                     </tr>
                     <tr>
                       <th scope="row" rowSpan={2}>
@@ -264,18 +247,16 @@ const CaseEndComponent = ({ data, id }) => {
                       <td colSpan="4">{data.modes.results[0].gpu_length}</td>
                     </tr>
                     <tr>
-                      <th scope="col">Full</th>
-                      <th scope="col">Low</th>
-                      <th scope="col">Extra Full</th>
-                      <th scope="col">Extra Low</th>
+                      <th scope="col">Slots</th>
+                      <th scope="col">Low Profile Slots</th>
+                      <th scope="col">Extra Slots</th>
+                      <th scope="col">Extra Low Profile Slots</th>
                     </tr>
                     <tr>
-                      <td>{data.modes.results[0].slot}</td>
+                      <td>{data.modes.results[0].slot || "-"}</td>
                       <td>{data.modes.results[0].low_profile_slot || "-"}</td>
                       <td>{data.modes.results[0].extra_slot || "-"}</td>
-                      <td>
-                        {data.modes.results[0].extra_low_profile_slot || "-"}
-                      </td>
+                      <td>{data.modes.results[0].extra_low_profile_slot || "-"}</td>
                     </tr>
                   </tbody>
                 </table>

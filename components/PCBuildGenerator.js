@@ -554,7 +554,7 @@ export default function PCBuildGenerator() {
                   type="text"
                   value={searchText}
                   onChange={handleSearchChange}
-                  placeholder="e.g., RTX 3080, RX 6800 XT"
+                  placeholder="e.g., RTX 5080, RX 6800 XT"
                   className="w-full p-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-white focus:border-white"
                 />
                 {gpus.length > 0 && searchText && (

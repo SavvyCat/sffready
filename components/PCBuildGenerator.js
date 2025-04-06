@@ -506,7 +506,7 @@ export default function PCBuildGenerator() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6">
+    <div className="flex flex-col items-center justify-center p-4 sm:p-2">
       <div className="max-w-6xl w-full mx-auto bg-zinc-900 rounded-xl shadow-2xl shadow-black/50 overflow-hidden border border-zinc-800">
         <div className="p-6 bg-gradient-to-r from-black to-zinc-900 border-b border-zinc-800">
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">
@@ -521,9 +521,8 @@ export default function PCBuildGenerator() {
             Ai PC Build Generator
           </h1>
           <p className="text-gray-400 mt-2">
-            Pick out your GPU and select a compatible case, set your budget for
-            the remaining components, and get a PC build recommendation with the
-            best compatible hardware.
+          Choose a GPU, pick a compatible case, set a budget for the rest, 
+          and get an AI-powered PC build recommendation with compatible parts.
           </p>
         </div>
 

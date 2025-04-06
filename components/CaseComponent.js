@@ -1,5 +1,4 @@
 const CaseEndComponent = ({ data, id }) => {
-  console.log(data.modes.results[0]);
   return (
     <>
       <main className="sm:px-2">

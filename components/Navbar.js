@@ -11,10 +11,10 @@ export default function NavBar() {
         <h1 className="text-xl sm:text-2xl font-bold text-white">
           <Link href="/">SFF Ready?</Link>
         </h1>
-        <nav className="flex space-x-4">
+        <nav className="flex space-x-2 sm:space-x-4">
           <Link
             href="/"
-            className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
               pathname === "/"
                 ? "bg-blue-600 text-white"
                 : "text-zinc-300 hover:bg-zinc-700"
@@ -24,13 +24,23 @@ export default function NavBar() {
           </Link>
           <Link
             href="/build"
-            className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+            className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
               pathname === "/build"
                 ? "bg-blue-600 text-white"
                 : "text-zinc-300 hover:bg-zinc-700"
             }`}
           >
             PC Builder
+          </Link>
+          <Link
+            href="/request-case"
+            className={`px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+              pathname === "/request-case"
+                ? "bg-blue-600 text-white"
+                : "text-zinc-300 hover:bg-zinc-700"
+            }`}
+          >
+            Request Case
           </Link>
         </nav>
       </div>

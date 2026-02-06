@@ -8,7 +8,7 @@ const INITIAL_COOLDOWN = 0; // No delay between first requests
 const MAX_INITIAL_REQUESTS = 4;
 const RESET_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds (was 12 hours)
 
-export async function middleware(request) {
+export async function proxy(request) {
   // Skip rate limiting for non-API routes
   if (!request.nextUrl.pathname.startsWith("/api/generate-build")) {
     return NextResponse.next();
@@ -154,7 +154,7 @@ export async function middleware(request) {
   return response;
 }
 
-// Configure middleware to run only for specific paths
+// Configure proxy to run only for specific paths
 export const config = {
   matcher: ["/api/generate-build"],
 };

@@ -41,6 +41,7 @@ export default function Home() {
     "emTek",
   ];
   const [cases, setCases] = useState([]);
+  const [casesLoading, setCasesLoading] = useState(true);
   const [length, setLength] = useState(285);
   const [height, setHeight] = useState(112);
   const [thickness, setThickness] = useState(2);
@@ -52,8 +53,8 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("All Brands");
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalUrl, setModalUrl] = useState("");
   const [id, setid] = useState(null);
+  const [modalImageUrls, setModalImageUrls] = useState(null);
 
   const loadMore = () => {
     setVisibleCount((prevCount) => prevCount + 8);
@@ -71,11 +72,14 @@ export default function Home() {
   };
 
   useEffect(() => {
-    async function getData() {
+    setCasesLoading(true);
+    const timeout = setTimeout(async () => {
       const filteredCases = await getFilteredCases(length, height, thickness);
       setCases(filteredCases);
-    }
-    getData();
+      setCasesLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timeout);
   }, [length, height, thickness]);
 
   const handleSearchChange = (e) => {
@@ -122,16 +126,16 @@ export default function Home() {
   };
 
   // Function to open modal
-  const openModal = (url, id) => {
-    setModalUrl(url);
+  const openModal = (id, imageUrls) => {
     setid(id);
+    setModalImageUrls(imageUrls);
     setIsModalOpen(true);
   };
 
   // Function to close modal
   const closeModal = () => {
     setIsModalOpen(false);
-    setModalUrl(""); // Clear the URL when closing
+    setModalImageUrls(null);
   };
 
   const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
@@ -302,27 +306,50 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="max-w-[50rem]">
+          <div className="max-w-[50rem] w-full">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {cases.slice(0, visibleCount).map((caseItem, index) => {
-                const imagelocation1 = `/images/${caseItem.image_id}/1.jpg`;
-                return (
-                  <div
-                    key={index}
-                    className="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300"
-                  >
-                    <img
-                      src={imagelocation1}
-                      alt={`Case Image ${index + 1}`}
-                      className="w-full h-48 bg-slate-200 cursor-pointer"
-                      onClick={() => openModal(caseItem.url, caseItem.image_id)} // Open modal on image click
-                    />
-                    <p className="flex justify-center items-center text-sm">
-                      {caseItem.product_name}
-                    </p>
-                  </div>
-                );
-              })}
+              {casesLoading
+                ? Array.from({ length: 8 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="bg-white rounded-lg overflow-hidden shadow-lg w-full"
+                    >
+                      <div className="w-full h-48 bg-slate-300 animate-pulse"></div>
+                      <p className="flex justify-center items-center text-sm">
+                        <span className="inline-block h-4 bg-slate-300 rounded animate-pulse w-3/4" />
+                      </p>
+                    </div>
+                  ))
+                : cases.slice(0, visibleCount).map((caseItem, index) => {
+                    let imageUrl;
+                    if (caseItem.image_urls) {
+                      try {
+                        const urls = JSON.parse(caseItem.image_urls);
+                        imageUrl = urls.length > 0 ? urls[0] : `/images/${caseItem.image_id}/1.jpg`;
+                      } catch {
+                        imageUrl = `/images/${caseItem.image_id}/1.jpg`;
+                      }
+                    } else {
+                      imageUrl = `/images/${caseItem.image_id}/1.jpg`;
+                    }
+
+                    return (
+                      <div
+                        key={index}
+                        className="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300"
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={`Case Image ${index + 1}`}
+                          className="w-full h-48 bg-slate-200 cursor-pointer"
+                          onClick={() => openModal(caseItem.image_id, caseItem.image_urls)}
+                        />
+                        <p className="flex justify-center items-center text-sm">
+                          {caseItem.product_name}
+                        </p>
+                      </div>
+                    );
+                  })}
             </div>
           </div>
           {visibleCount < cases.length && (
@@ -340,7 +367,7 @@ export default function Home() {
       </div>
 
       {/* Modal Component */}
-      <Modal isOpen={isModalOpen} onClose={closeModal} url={modalUrl} id={id} />
+      <Modal isOpen={isModalOpen} onClose={closeModal} id={id} imageUrls={modalImageUrls} />
     </div>
   );
 }

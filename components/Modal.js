@@ -3,32 +3,29 @@
 import { useEffect, useState } from "react";
 import CaseEndComponent from "./CaseComponent";
 
-const Modal = ({ isOpen, onClose, url, id }) => {
+const Modal = ({ isOpen, onClose, id, imageUrls }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Extract the result from the URL
-  const result = url.split("abee/")[1];
-
   useEffect(() => {
     if (isOpen) {
-      // Fetch the data when the modal is opened
       const fetchData = async () => {
         setLoading(true);
         setError(null);
         try {
-          const response = await fetch(
-            `https://backend-ochre-tau-58.vercel.app/case?name=${result}`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch data");
+          const response = await fetch(`/api/case-details?imageId=${id}`);
+          const result = await response.json();
+
+          if (response.ok && result.found) {
+            setData(result.data);
+          } else {
+            throw new Error("Case details not found");
           }
-          const fetchedData = await response.json();
-          setData(fetchedData); // Set the fetched data
-          setLoading(false);
         } catch (err) {
+          console.error("Modal fetch error:", err);
           setError(err.message);
+        } finally {
           setLoading(false);
         }
       };
@@ -45,7 +42,7 @@ const Modal = ({ isOpen, onClose, url, id }) => {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [isOpen, result]);
+  }, [isOpen, id]);
 
   if (!isOpen) return null;
 
@@ -94,7 +91,7 @@ const Modal = ({ isOpen, onClose, url, id }) => {
             {/* Render CaseDetails if data is available */}
             {!loading && data && (
               <div className="w-full">
-                <CaseEndComponent data={data} id={id} />
+                <CaseEndComponent data={data} id={id} imageUrls={imageUrls} />
               </div>
             )}
           </div>

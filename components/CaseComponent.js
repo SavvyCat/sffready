@@ -1,4 +1,17 @@
-const CaseEndComponent = ({ data, id }) => {
+const CaseEndComponent = ({ data, id, imageUrls }) => {
+  // Get image URL - prioritize imageUrls from storage, fallback to static images
+  let imageUrl = `/images/${id}/1.jpg`; // Default fallback
+  if (imageUrls) {
+    try {
+      const urls = JSON.parse(imageUrls);
+      if (urls.length > 0) {
+        imageUrl = urls[0];
+      }
+    } catch {
+      // If parsing fails, use default fallback
+    }
+  }
+
   return (
     <>
       <main className="sm:px-2">
@@ -9,7 +22,7 @@ const CaseEndComponent = ({ data, id }) => {
                 <div className="flex border-2 border-black h-full justify-center items-center">
                   <div className="max-h-96 flex justify-center w-full h-full">
                     <img
-                      src={`/images/${id}/1.jpg`}
+                      src={imageUrl}
                       width="800"
                       height="800"
                       className="object-contain h-full"

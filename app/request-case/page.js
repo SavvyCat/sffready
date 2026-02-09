@@ -6,45 +6,31 @@ export default function RequestCasePage() {
     product_name: "",
     url: "",
     eol: false,
-    // GPU compatibility
-    length: "",
-    height: "",
-    slots: "",
     // Dimensions
     width: "",
     depth: "",
+    gpu_height: "",
     volume: "",
-    // Materials
-    skeleton_material: "3",
-    shell_material: "3",
-    // Panels
-    open_panel: false,
-    solid_panel: false,
-    mesh_panel: false,
-    transparent_panel: false,
     // Motherboard
-    motherboard_width: "",
-    motherboard_length: "",
+    mb_atx: false,
+    mb_matx: false,
+    mb_itx: false,
     // PSU
-    psu_width: "",
-    psu_height: "",
-    psu_length: "",
+    psu_atx: false,
+    psu_sfxl: false,
+    psu_sfx: false,
+    psu_flex: false,
     // CPU
     cpu_height: "",
+    l120: false,
+    l140: false,
     l240: false,
     l280: false,
     l360: false,
-    // GPU details
-    gpu_width: "",
-    gpu_height: "",
-    gpu_length: "",
-    slot: "",
-    low_profile_slot: "",
-    extra_slot: "",
-    extra_low_profile_slot: "",
-    pcie_riser: false,
-    // Features
-    usb_c: false,
+    // Materials
+    material: "Steel",
+    // Release Year
+    release_year: "",
   });
 
   const [image, setImage] = useState(null);
@@ -119,45 +105,25 @@ export default function RequestCasePage() {
       product_name: "Cooler Master NR200",
       url: "https://www.coolermaster.com/catalog/cases/mini-itx/masterbox-nr200/",
       eol: false,
-      // GPU compatibility
-      length: "330",
-      height: "156",
-      slots: "3",
-      // Dimensions
       width: "185",
       depth: "376",
+      gpu_height: "274",
       volume: "18.25",
-      // Materials
-      skeleton_material: "3",
-      shell_material: "3",
-      // Panels
-      open_panel: false,
-      solid_panel: true,
-      mesh_panel: true,
-      transparent_panel: true,
-      // Motherboard
-      motherboard_width: "170",
-      motherboard_length: "170",
-      // PSU
-      psu_width: "150",
-      psu_height: "86",
-      psu_length: "180",
-      // CPU
+      mb_atx: false,
+      mb_matx: false,
+      mb_itx: true,
+      psu_atx: false,
+      psu_sfxl: true,
+      psu_sfx: true,
+      psu_flex: false,
       cpu_height: "155",
+      l120: false,
+      l140: false,
       l240: true,
       l280: true,
       l360: false,
-      // GPU details
-      gpu_width: "60",
-      gpu_height: "292",
-      gpu_length: "330",
-      slot: "3",
-      low_profile_slot: "0",
-      extra_slot: "0",
-      extra_low_profile_slot: "0",
-      pcie_riser: false,
-      // Features
-      usb_c: false,
+      material: "Steel",
+      release_year: "2020",
     });
     setMessage("Test data filled with auto-generated test image!");
   };
@@ -195,36 +161,25 @@ export default function RequestCasePage() {
           product_name: "",
           url: "",
           eol: false,
-          length: "",
-          height: "",
-          slots: "",
           width: "",
           depth: "",
+          gpu_height: "",
           volume: "",
-          skeleton_material: "3",
-          shell_material: "3",
-          open_panel: false,
-          solid_panel: false,
-          mesh_panel: false,
-          transparent_panel: false,
-          motherboard_width: "",
-          motherboard_length: "",
-          psu_width: "",
-          psu_height: "",
-          psu_length: "",
+          mb_atx: false,
+          mb_matx: false,
+          mb_itx: false,
+          psu_atx: false,
+          psu_sfxl: false,
+          psu_sfx: false,
+          psu_flex: false,
           cpu_height: "",
+          l120: false,
+          l140: false,
           l240: false,
           l280: false,
           l360: false,
-          gpu_width: "",
-          gpu_height: "",
-          gpu_length: "",
-          slot: "",
-          low_profile_slot: "",
-          extra_slot: "",
-          extra_low_profile_slot: "",
-          pcie_riser: false,
-          usb_c: false,
+          material: "Steel",
+          release_year: "",
         });
         setImage(null);
         setImagePreview(null);
@@ -325,61 +280,6 @@ export default function RequestCasePage() {
             </div>
           </section>
 
-          {/* GPU Compatibility */}
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-              GPU Compatibility
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max GPU Length (mm) *
-                </label>
-                <input
-                  type="number"
-                  name="length"
-                  value={formData.length}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="e.g., 285"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max GPU Height (mm) *
-                </label>
-                <input
-                  type="number"
-                  name="height"
-                  value={formData.height}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="e.g., 112"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max GPU Slots *
-                </label>
-                <input
-                  type="number"
-                  name="slots"
-                  value={formData.slots}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                  step="0.1"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="e.g., 2.5"
-                />
-              </div>
-            </div>
-          </section>
-
           {/* Case Dimensions */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
@@ -445,125 +345,41 @@ export default function RequestCasePage() {
             </div>
           </section>
 
-          {/* Materials & Panels */}
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-              Materials & Panels
-            </h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Skeleton Material
-                  </label>
-                  <select
-                    name="skeleton_material"
-                    value={formData.skeleton_material}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="3">Steel</option>
-                    <option value="0">Unknown</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Shell Material
-                  </label>
-                  <select
-                    name="shell_material"
-                    value={formData.shell_material}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="3">Steel</option>
-                    <option value="0">Unknown</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Side Panel Types
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="open_panel"
-                      checked={formData.open_panel}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label className="ml-2 text-sm text-gray-700">Open</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="solid_panel"
-                      checked={formData.solid_panel}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label className="ml-2 text-sm text-gray-700">Solid</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="mesh_panel"
-                      checked={formData.mesh_panel}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label className="ml-2 text-sm text-gray-700">Mesh</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="transparent_panel"
-                      checked={formData.transparent_panel}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label className="ml-2 text-sm text-gray-700">
-                      Transparent
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* Motherboard Support */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
               Motherboard Support
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max Motherboard Width (mm)
-                </label>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="flex items-center">
                 <input
-                  type="number"
-                  name="motherboard_width"
-                  value={formData.motherboard_width}
+                  type="checkbox"
+                  name="mb_atx"
+                  checked={formData.mb_atx}
                   onChange={handleChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
+                <label className="ml-2 text-sm text-gray-700">ATX</label>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max Motherboard Length (mm)
-                </label>
+              <div className="flex items-center">
                 <input
-                  type="number"
-                  name="motherboard_length"
-                  value={formData.motherboard_length}
+                  type="checkbox"
+                  name="mb_matx"
+                  checked={formData.mb_matx}
                   onChange={handleChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
+                <label className="ml-2 text-sm text-gray-700">Micro-ATX</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="mb_itx"
+                  checked={formData.mb_itx}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label className="ml-2 text-sm text-gray-700">Mini-ITX</label>
               </div>
             </div>
           </section>
@@ -573,45 +389,46 @@ export default function RequestCasePage() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
               Power Supply Support
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max PSU Width (mm)
-                </label>
+            <div className="grid grid-cols-4 gap-3">
+              <div className="flex items-center">
                 <input
-                  type="number"
-                  name="psu_width"
-                  value={formData.psu_width}
+                  type="checkbox"
+                  name="psu_atx"
+                  checked={formData.psu_atx}
                   onChange={handleChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
+                <label className="ml-2 text-sm text-gray-700">ATX</label>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max PSU Height (mm)
-                </label>
+              <div className="flex items-center">
                 <input
-                  type="number"
-                  name="psu_height"
-                  value={formData.psu_height}
+                  type="checkbox"
+                  name="psu_sfxl"
+                  checked={formData.psu_sfxl}
                   onChange={handleChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
+                <label className="ml-2 text-sm text-gray-700">SFX-L</label>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Max PSU Length (mm)
-                </label>
+              <div className="flex items-center">
                 <input
-                  type="number"
-                  name="psu_length"
-                  value={formData.psu_length}
+                  type="checkbox"
+                  name="psu_sfx"
+                  checked={formData.psu_sfx}
                   onChange={handleChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
+                <label className="ml-2 text-sm text-gray-700">SFX</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="psu_flex"
+                  checked={formData.psu_flex}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label className="ml-2 text-sm text-gray-700">Flex</label>
               </div>
             </div>
           </section>
@@ -639,7 +456,27 @@ export default function RequestCasePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Liquid Cooling Support
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-5 gap-3">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="l120"
+                      checked={formData.l120}
+                      onChange={handleChange}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label className="ml-2 text-sm text-gray-700">120mm</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="l140"
+                      checked={formData.l140}
+                      onChange={handleChange}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label className="ml-2 text-sm text-gray-700">140mm</label>
+                  </div>
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -675,125 +512,43 @@ export default function RequestCasePage() {
             </div>
           </section>
 
-          {/* GPU Details */}
+          {/* Materials & Panels */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-              GPU Details
+              Materials & Panels
             </h2>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    GPU Width (mm)
-                  </label>
-                  <input
-                    type="number"
-                    name="gpu_width"
-                    value={formData.gpu_width}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    GPU Length (mm)
-                  </label>
-                  <input
-                    type="number"
-                    name="gpu_length"
-                    value={formData.gpu_length}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="pcie_riser"
-                    checked={formData.pcie_riser}
-                    onChange={handleChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label className="ml-2 text-sm text-gray-700">
-                    PCI-E Riser
-                  </label>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Slots
-                  </label>
-                  <input
-                    type="number"
-                    name="slot"
-                    value={formData.slot}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Low Profile Slots
-                  </label>
-                  <input
-                    type="number"
-                    name="low_profile_slot"
-                    value={formData.low_profile_slot}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Extra Slots
-                  </label>
-                  <input
-                    type="number"
-                    name="extra_slot"
-                    value={formData.extra_slot}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Extra LP Slots
-                  </label>
-                  <input
-                    type="number"
-                    name="extra_low_profile_slot"
-                    value={formData.extra_low_profile_slot}
-                    onChange={handleChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Main Construction Material:
+              </label>
+              <select
+                name="material"
+                value={formData.material}
+                onChange={handleChange}
+                className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="Steel">Steel</option>
+                <option value="Aluminum">Aluminum</option>
+                <option value="Plastic">Plastic</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </section>
 
-          {/* Features */}
+          {/* Release Year */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">
-              Features
+              Release Year
             </h2>
-            <div className="flex items-center">
+            <div>
               <input
-                type="checkbox"
-                name="usb_c"
-                checked={formData.usb_c}
+                type="text"
+                name="release_year"
+                value={formData.release_year}
                 onChange={handleChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="w-full md:w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="(example: 2020)"
               />
-              <label className="ml-2 text-sm text-gray-700">
-                USB-C Front Panel
-              </label>
             </div>
           </section>
 

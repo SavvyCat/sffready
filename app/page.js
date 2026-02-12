@@ -51,6 +51,7 @@ export default function Home() {
   const [visibleCount, setVisibleCount] = useState(8);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("All Brands");
+  const [sortBy, setSortBy] = useState("default");
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [id, setid] = useState(null);
@@ -137,6 +138,21 @@ export default function Home() {
     setIsModalOpen(false);
     setModalImageUrls(null);
   };
+
+  const sortedCases = [...cases].sort((a, b) => {
+    switch (sortBy) {
+      case "volume-asc":
+        return (a.volume || 999) - (b.volume || 999);
+      case "volume-desc":
+        return (b.volume || 0) - (a.volume || 0);
+      case "name-asc":
+        return (a.product_name || "").localeCompare(b.product_name || "");
+      case "name-desc":
+        return (b.product_name || "").localeCompare(a.product_name || "");
+      default:
+        return 0;
+    }
+  });
 
   const gpuimagelocation = `/images-gpu/${selectedGpu?.image_id}.jpg`;
 
@@ -307,6 +323,19 @@ export default function Home() {
             </div>
           </div>
           <div className="max-w-[50rem] w-full">
+            <div className="flex justify-end mb-3">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="default">Sort: Default</option>
+                <option value="volume-asc">Volume: Low to High</option>
+                <option value="volume-desc">Volume: High to Low</option>
+                <option value="name-asc">Name: A to Z</option>
+                <option value="name-desc">Name: Z to A</option>
+              </select>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {casesLoading
                 ? Array.from({ length: 8 }).map((_, index) => (
@@ -320,7 +349,7 @@ export default function Home() {
                       </p>
                     </div>
                   ))
-                : cases.slice(0, visibleCount).map((caseItem, index) => {
+                : sortedCases.slice(0, visibleCount).map((caseItem, index) => {
                     let imageUrl;
                     if (caseItem.image_urls) {
                       try {
@@ -352,7 +381,7 @@ export default function Home() {
                   })}
             </div>
           </div>
-          {visibleCount < cases.length && (
+          {visibleCount < sortedCases.length && (
             <div className="flex justify-center mt-5">
               <button
                 onClick={loadMore}

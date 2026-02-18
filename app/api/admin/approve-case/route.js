@@ -107,19 +107,14 @@ export async function POST(request) {
       }
     }
 
-    // Prepare data for CASES table (matching your existing simple structure)
-    // Calculate gpu_thickness from slots (typically ~20mm per slot)
-    const gpuThickness = caseRequest.slots ? Math.round(caseRequest.slots * 20) : null;
-
     const caseData = {
       product_name: caseRequest.product_name,
       url: caseRequest.url,
-      length: caseRequest.length,
-      height: caseRequest.height,
-      "gpu_thickness_(mm)": gpuThickness, // Calculate thickness from slots
-      slots: caseRequest.slots, // Keep slots as separate field
+      length: caseRequest.length || 9999,
+      height: caseRequest.height || 9999,
+      slots: caseRequest.slots || 99,
       image_id: nextImageId.toString(),
-      image_urls: approvedImageUrls.length > 0 ? JSON.stringify(approvedImageUrls) : null, // Store image URLs
+      image_urls: approvedImageUrls.length > 0 ? JSON.stringify(approvedImageUrls) : null,
     };
 
     // Insert into CASES table

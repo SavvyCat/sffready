@@ -39,6 +39,7 @@ function formatCaseData(row) {
           extra_slot: row.extra_slot,
           extra_low_profile_slot: row.extra_low_profile_slot,
           usb_c: row.usb_c,
+          psu_compatibility: row.psu_compatibility,
         },
       ],
     },
@@ -57,17 +58,21 @@ export async function GET(request) {
       );
     }
 
-    console.log("Fetching case details for image_id:", imageId);
+    console.log("Fetching case details for image_id:", imageId, "type:", typeof imageId);
 
-    // 1. Try case_details table first (pre-scraped data)
-    const { data: caseDetail, error: detailError } = await supabase
-      .from("case_details")
+    // 1. Try casesdetails table first
+    const numericId = Number(imageId);
+    const { data: caseDetails, error: detailError } = await supabase
+      .from("casesdetails")
       .select("*")
-      .eq("image_id", imageId)
-      .single();
+      .eq("image_id", numericId);
+
+    console.log("casesdetails query result:", { numericId, count: caseDetails?.length, error: detailError?.message });
+
+    const caseDetail = caseDetails?.[0] || null;
 
     if (!detailError && caseDetail) {
-      console.log("Found case in case_details:", caseDetail.product_name);
+      console.log("Found case in casesdetails:", caseDetail.product_name);
       return NextResponse.json(
         { found: true, data: formatCaseData(caseDetail) },
         { status: 200 }

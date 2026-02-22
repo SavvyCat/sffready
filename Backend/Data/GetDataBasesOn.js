@@ -18,7 +18,7 @@ export default async function getFilteredCases(gpuLength, gpuHeight, gpuSlots) {
   const imageIds = CASES.map((c) => c.image_id);
   if (imageIds.length > 0) {
     const { data: details } = await supabase
-      .from("case_details")
+      .from("casesdetails")
       .select("image_id, volume, product_name")
       .in("image_id", imageIds);
 

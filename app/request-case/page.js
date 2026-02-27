@@ -63,71 +63,6 @@ export default function RequestCasePage() {
     }
   };
 
-  const createTestImage = () => {
-    // Create a canvas element
-    const canvas = document.createElement("canvas");
-    canvas.width = 400;
-    canvas.height = 300;
-    const ctx = canvas.getContext("2d");
-
-    // Draw a simple test image
-    ctx.fillStyle = "#4A5568";
-    ctx.fillRect(0, 0, 400, 300);
-    ctx.fillStyle = "#FFFFFF";
-    ctx.font = "20px Arial";
-    ctx.fillText("Test Image", 150, 140);
-    ctx.fillText("Cooler Master NR200", 100, 170);
-
-    // Convert canvas to blob
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => {
-        const file = new File([blob], "test-image.png", { type: "image/png" });
-        resolve(file);
-      }, "image/png");
-    });
-  };
-
-  const fillTestData = async () => {
-    // Create test image
-    setImageLoading(true);
-    const testImage = await createTestImage();
-    setImage(testImage);
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-      setImageLoading(false);
-    };
-    reader.readAsDataURL(testImage);
-
-    setFormData({
-      product_name: "Cooler Master NR200",
-      url: "https://www.coolermaster.com/catalog/cases/mini-itx/masterbox-nr200/",
-      eol: false,
-      width: "185",
-      depth: "376",
-      gpu_height: "274",
-      volume: "18.25",
-      mb_atx: false,
-      mb_matx: false,
-      mb_itx: true,
-      psu_atx: false,
-      psu_sfxl: true,
-      psu_sfx: true,
-      psu_flex: false,
-      cpu_height: "155",
-      l120: false,
-      l140: false,
-      l240: true,
-      l280: true,
-      l360: false,
-      material: "Steel",
-      release_year: "2020",
-    });
-    setMessage("Test data filled with auto-generated test image!");
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -204,19 +139,6 @@ export default function RequestCasePage() {
           Help us expand our database by submitting a PC case. Please fill in as
           many details as possible.
         </p>
-
-        <div className="mb-6">
-          <button
-            type="button"
-            onClick={fillTestData}
-            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm"
-          >
-            Fill Test Data (Cooler Master NR200)
-          </button>
-          <p className="text-xs text-gray-500 mt-1">
-            Click to auto-fill the form with example data for testing
-          </p>
-        </div>
 
         {message && (
           <div
